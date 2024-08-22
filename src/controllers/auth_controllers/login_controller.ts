@@ -7,27 +7,24 @@ import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../utils/response_handler";
-import { check, validationResult } from "express-validator";
+import { loginValidationRules, validateRequest } from "../../utils/validations";
+import config from "../../config";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   // Validation
-  await check("email", "Please include a valid email")
-    .isEmail()
-    .isLength({ max: 250 })
-    .run(req);
-  await check("password", "Password is required")
-    .isLength({ min: 6, max: 250 })
-    .run(req);
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorDetails = errors.array()[0].msg;
+  const validationErrors = await validateRequest(
+    req,
+    res,
+    loginValidationRules
+  );
+  if (validationErrors !== "validation successful") {
     return sendErrorResponse({
-      res: res,
+      res,
       message: "Invalid input",
       errorCode: "INVALID_INPUT",
-      errorDetails: errorDetails,
+      errorDetails: validationErrors,
       status: 400,
     });
   }
@@ -41,14 +38,11 @@ export const login = async (req: Request, res: Response) => {
     // Find the user by sanitized email
     const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
-      console.log(
-        `Login attempt failed: User not found for email ${sanitizedEmail}`
-      );
       return sendErrorResponse({
         res: res,
         message: "Invalid credentials",
         errorCode: "INVALID_CREDENTIALS",
-        errorDetails: "User not found",
+        errorDetails: "There is no account associated with this email.",
       });
     }
 
@@ -58,30 +52,42 @@ export const login = async (req: Request, res: Response) => {
         res: res,
         message: "Your account is disabled",
         errorCode: "ACCOUNT_DISABLED",
-        errorDetails: "Account is not activated",
+        errorDetails:
+          "Account is not activated, please contact the support team.",
       });
     }
 
-    // Check if the account is deleted and if it's been more than 15 days
+    // Check if the account is deleted and if it's been more than config.app.recoveryPeriod days
     if (user.isDeleted && user.deletedAt) {
-      const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
-      if (user.deletedAt.getTime() < fifteenDaysAgo.getTime()) {
+      // Current date
+      const now = new Date();
+
+      // Recovery period end date (config.app.recoveryPeriod days after `deletedAt`)
+      const recoveryEndDate = new Date(
+        user.deletedAt.getTime() +
+          config.app.recoveryPeriod * 24 * 60 * 60 * 1000
+      );
+
+      // Calculate the number of days left in the recovery period
+      const daysLeftInRecoveryPeriod = Math.ceil(
+        (recoveryEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysLeftInRecoveryPeriod > 0) {
+        messagesForUser.push(
+          `Your account is in the recovery period. You have ${daysLeftInRecoveryPeriod} day${
+            daysLeftInRecoveryPeriod !== 1 ? "s" : ""
+          } left to reactivate it.`
+        );
+      } else {
         return sendErrorResponse({
           res: res,
           message: "Account has been permanently deleted",
           errorCode: "ACCOUNT_DELETED",
-          errorDetails: "Account deletion period has expired",
+          errorDetails:
+            "The 15-day recovery period has ended. Your account is scheduled for permanent deletion.",
           status: 403,
         });
-      } else {
-        const daysLeft = Math.ceil(
-          (user.deletedAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-        );
-        messagesForUser.push(
-          `Your account is scheduled for deletion. You have ${daysLeft} day${
-            daysLeft !== 1 ? "s" : ""
-          } left to reactivate it.`
-        );
       }
     }
 
@@ -95,8 +101,14 @@ export const login = async (req: Request, res: Response) => {
         res: res,
         message: "Invalid credentials",
         errorCode: "INVALID_CREDENTIALS",
-        errorDetails: "Password does not match",
+        errorDetails:
+          "Password is incorrect, please try again with a different password.",
       });
+    }
+
+    // check is user email verified
+    if (!user.emailVerified) {
+      messagesForUser.push(`Please verify your email to use full features.`);
     }
 
     // Update last login timestamp
@@ -134,7 +146,7 @@ export const login = async (req: Request, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "INTERNAL_SERVER_ERROR",
-      errorDetails: "An unexpected error occurred",
+      errorDetails: "An unexpected error occurred, Please try again later.",
       status: 500,
     });
   }

@@ -5,6 +5,10 @@ import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../../utils/response_handler";
+import {
+  deleteAccountValidationRules,
+  validateRequest,
+} from "../../../utils/validations";
 
 interface AuthRequest extends Request {
   user?: JwtPayload["user"];
@@ -38,13 +42,19 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Validate reasons
-    if (!Array.isArray(reasons)) {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      deleteAccountValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
-        message: "Invalid reasons format",
-        errorCode: "INVALID_REASONS",
-        errorDetails: "Reasons must be provided as an array",
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
       });
     }
 
@@ -83,7 +93,8 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while deleting the user",
+      errorDetails:
+        "An unexpected error occurred while deleting the user, Please try again later.",
       status: 500,
     });
   }

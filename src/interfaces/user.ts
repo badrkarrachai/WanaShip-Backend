@@ -8,8 +8,6 @@ export interface IUser extends Document {
   avatar?: string;
   isActivated: boolean;
   role: string;
-  incomes: Types.ObjectId[];
-  expenses: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   lastLogin?: Date;

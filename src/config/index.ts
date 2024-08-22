@@ -17,6 +17,7 @@ export default {
     issuer: process.env.ISSUER,
     version: process.env.APP_VERSION,
     audience: process.env.AUDIENCE,
+    recoveryPeriod: parseInt(process.env.ACCOUNT_RECOVERY_PERIOD, 10),
   },
   logs: {
     morgan: process.env.MORGAN,

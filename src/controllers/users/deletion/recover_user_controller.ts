@@ -81,7 +81,7 @@ export const recoverUser = async (req: AuthRequest, res: Response) => {
       message: "Server error",
       errorCode: "SERVER_ERROR",
       errorDetails:
-        "An unexpected error occurred while recovering the user account",
+        "An unexpected error occurred while recovering the user account, Please try again later.",
       status: 500,
     });
   }

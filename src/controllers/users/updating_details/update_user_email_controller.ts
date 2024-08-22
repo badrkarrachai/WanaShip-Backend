@@ -2,37 +2,40 @@ import { Request, Response } from "express";
 import User from "../../../models/users";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import { generateOTP } from "../../../utils/generate_otp";
-import config from "../../../config";
-import { readHtmlTemplate } from "../../../utils/read_html";
-import { sendEmail } from "../../../utils/email";
-import { verifyOTPLocally } from "../../auth_controllers/verify_otp";
 import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../../utils/response_handler";
+import { sendOTP, verifyOTPLocally } from "../../../utils/otp";
+import {
+  updateProfileEmailValidationRules,
+  updateProfileEmailViaOTPValidationRules,
+  validateRequest,
+} from "../../../utils/validations";
 
 export const requestUpdateUserEmail = async (req: Request, res: Response) => {
   const { email, currentEmail, currentPassword } = req.body;
   try {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      updateProfileEmailValidationRules
+    );
+    if (validationErrors !== "validation successful") {
+      return sendErrorResponse({
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
+      });
+    }
+
     // Sanitize inputs
     const sanitizedNewEmail = validator.normalizeEmail(email) || "";
     const sanitizedCurrentEmail = validator.normalizeEmail(currentEmail) || "";
     const sanitizedCurrentPassword = validator.escape(currentPassword) || "";
-
-    // Validate email format and length is less than 250
-    if (
-      !validator.isEmail(sanitizedNewEmail) ||
-      !validator.isLength(sanitizedNewEmail, { max: 250 })
-    ) {
-      return sendErrorResponse({
-        res: res,
-        message: "Invalid email format",
-        errorCode: "INVALID_EMAIL",
-        errorDetails:
-          "The provided email is not valid or exceeds the maximum length",
-      });
-    }
 
     // Check if new email is different from current email
     if (sanitizedNewEmail === sanitizedCurrentEmail) {
@@ -78,28 +81,10 @@ export const requestUpdateUserEmail = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate 6-digit OTP
-    const { hashedOtp, otp } = await generateOTP();
-    user.resetPasswordOTP = hashedOtp;
-    user.resetPasswordOTPExpires = new Date(
-      Date.now() + config.otp.expiration * 60 * 1000
-    );
-    await user.save();
-
-    // Read HTML template and replace placeholders
-    let htmlTemplate = readHtmlTemplate("request_otp.html");
-    htmlTemplate = htmlTemplate.replace("{{OTP}}", otp);
-    htmlTemplate = htmlTemplate.replace(
-      "{{EXP-OTP}}",
-      config.otp.expiration.toString()
-    );
-
-    // Send email
-    sendEmail({
-      to: user.email,
-      subject: "Email Update OTP",
-      html: htmlTemplate,
-      text: "",
+    // send OTP
+    sendOTP({
+      userOTP: user,
+      subjectOTP: "Email Update OTP",
     });
 
     // Send response
@@ -123,6 +108,22 @@ export const requestUpdateUserEmail = async (req: Request, res: Response) => {
 export const updateUserEmailViaOTP = async (req: Request, res: Response) => {
   const { email, currentEmail, otp } = req.body;
   try {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      updateProfileEmailViaOTPValidationRules
+    );
+    if (validationErrors !== "validation successful") {
+      return sendErrorResponse({
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
+      });
+    }
+
     // Sanitize inputs
     const sanitizedCurrentEmail = validator.normalizeEmail(currentEmail) || "";
     const sanitizedNewEmail = validator.normalizeEmail(email) || "";
@@ -141,17 +142,26 @@ export const updateUserEmailViaOTP = async (req: Request, res: Response) => {
 
     // Verify OTP locally
     const isValid = await verifyOTPLocally(user, otp);
+    if (isValid === "OTP_EXPIRED") {
+      return sendErrorResponse({
+        res: res,
+        message: "OTP expired",
+        errorCode: "EXPIRED_OTP",
+        errorDetails: "The provided OTP is expired.",
+      });
+    }
     if (!isValid) {
       return sendErrorResponse({
         res: res,
-        message: "Invalid or expired OTP",
+        message: "Invalid OTP",
         errorCode: "INVALID_OTP",
-        errorDetails: "The provided OTP is not valid or has expired",
+        errorDetails: "The provided OTP is not valid.",
       });
     }
 
     // Update user email
     user.email = sanitizedNewEmail;
+    user.emailVerified = true;
     user.resetPasswordOTP = undefined;
     user.resetPasswordOTPExpires = undefined;
     await user.save();
@@ -170,7 +180,8 @@ export const updateUserEmailViaOTP = async (req: Request, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while updating the email",
+      errorDetails:
+        "An unexpected error occurred while updating the email, Please try again later.",
       status: 500,
     });
   }
