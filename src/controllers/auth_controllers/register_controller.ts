@@ -36,11 +36,14 @@ export const register = async (req: Request, res: Response) => {
         status: 400,
       });
     }
-
+    // Get the data from the request body
     const { name, email, password } = req.body;
+
+    // Sanitize the email and name
     const sanitizedEmail = validator.normalizeEmail(email) || "";
     const sanitizedName = validator.escape(name);
 
+    // Check if the user already exists
     const existingUser = await User.findOne({ email: sanitizedEmail });
     if (existingUser) {
       return sendErrorResponse({
@@ -52,14 +55,15 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, config.bcrypt.rounds);
 
+    // Create a new user
     const newUser = new User({
       name: sanitizedName,
       email: sanitizedEmail,
       password: hashedPassword,
     });
-
     await newUser.save();
 
     // check is user email verified
@@ -67,8 +71,10 @@ export const register = async (req: Request, res: Response) => {
       messagesForUser.push(`Please verify your email to use full features.`);
     }
 
+    // Send welcome email to the user
     await sendWelcomeEmail(existingUser);
 
+    // Prepare user data for response
     const userData = {
       id: newUser.id,
       name: newUser.name,
@@ -81,8 +87,10 @@ export const register = async (req: Request, res: Response) => {
       messages: messagesForUser,
     };
 
+    // Generate JWT token
     const token = generateToken(newUser.id, newUser.role);
 
+    // Send response
     return sendSuccessResponse({
       res,
       message: "registration successful",
@@ -101,6 +109,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+// Send welcome email to the user
 async function sendWelcomeEmail(user: any) {
   let htmlTemplate = readHtmlTemplate("welcome_to.html");
   htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
