@@ -1,15 +1,16 @@
 import { Document, Types } from "mongoose";
+import { IAddress } from "./address_interface";
+import { IImages } from "./image_interface";
 
 export interface IUser extends Document {
   name: string;
   email: string;
   emailVerified: boolean;
   password: string;
-  avatar?: string;
+  avatar?: IImages;
+  addresses?: IAddress[];
   isActivated: boolean;
   role: string;
-  createdAt: Date;
-  updatedAt: Date;
   lastLogin?: Date;
   twoFactorSecret?: string;
   twoFactorEnabled: boolean;

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import config from "../config";
-import { JwtPayload } from "../interfaces/jwt-payload";
+import { JwtPayload } from "../interfaces/jwt_payload_interface";
 
 const secret = config.jwtSecret;
 

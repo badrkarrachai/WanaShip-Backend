@@ -3,7 +3,7 @@ import { sendEmail } from "./email";
 import { readHtmlTemplate } from "../utils/read_html";
 import config from "../config";
 import bcrypt from "bcrypt";
-import { IUser } from "../interfaces/user";
+import { IUser } from "../interfaces/user_interface";
 
 interface OTPOptions {
   lengthOTP: number;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "../../models/users";
+import User from "../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import { sendEmail } from "../../utils/email";
@@ -15,6 +15,7 @@ import {
   registrationValidationRules,
   validateRequest,
 } from "../../utils/validations";
+import { IUser } from "../../interfaces/user_interface";
 
 // Registration with email verification false
 export const register = async (req: Request, res: Response) => {
@@ -72,7 +73,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Send welcome email to the user
-    await sendWelcomeEmail(existingUser);
+    await sendWelcomeEmail(newUser);
 
     // Prepare user data for response
     const userData = {
@@ -110,11 +111,11 @@ export const register = async (req: Request, res: Response) => {
 };
 
 // Send welcome email to the user
-async function sendWelcomeEmail(user: any) {
+async function sendWelcomeEmail(user: IUser) {
   let htmlTemplate = readHtmlTemplate("welcome_to.html");
   htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
 
-  await sendEmail({
+  sendEmail({
     to: user.email,
     subject: `Welcome to ${config.app.appName}!`,
     html: htmlTemplate,

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "../../../models/users";
+import User from "../../../models/users_model";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import {

@@ -1,6 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 import bcrypt from "bcryptjs";
-import { IUser } from "../interfaces/user";
+import { IUser } from "../interfaces/user_interface";
+import Address from "./address_model";
 
 const userSchema = new Schema<IUser>(
   {
@@ -8,7 +9,8 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     emailVerified: { type: Boolean, default: false },
     password: { type: String, required: true },
-    avatar: { type: String },
+    avatar: { type: Types.ObjectId, ref: "Image" },
+    addresses: [{ type: Types.ObjectId, ref: "Address" }],
     isActivated: { type: Boolean, default: true },
     role: {
       type: String,

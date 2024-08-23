@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
-import User from "../../models/users";
+import User from "../../models/users_model";
 import {
   sendSuccessResponse,
   sendErrorResponse,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import User from "../../../models/users";
-import { JwtPayload } from "../../../interfaces/jwt-payload";
+import User from "../../../models/users_model";
+import { JwtPayload } from "../../../interfaces/jwt_payload_interface";
 import {
   sendSuccessResponse,
   sendErrorResponse,

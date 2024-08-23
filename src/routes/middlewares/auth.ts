@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import config from "../../config";
-import { JwtPayload } from "../../interfaces/jwt-payload";
+import { JwtPayload } from "../../interfaces/jwt_payload_interface";
 import { sendErrorResponse } from "../../utils/response_handler";
 
 interface AuthRequest extends Request {
