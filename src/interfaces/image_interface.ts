@@ -5,4 +5,6 @@ export interface IImages extends Document {
   url: string;
   isDeleted: boolean;
   deletedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

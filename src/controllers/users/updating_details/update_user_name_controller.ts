@@ -9,8 +9,20 @@ import {
   updateProfileNameValidationRules,
   validateRequest,
 } from "../../../utils/validations";
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserName = async (req: Request, res: Response) => {
+export const updateUserName = async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return sendErrorResponse({
+      res: res,
+      message: "Unauthorized",
+      errorCode: "UNAUTHORIZED",
+      errorDetails: "User authentication is required for this action.",
+      status: 401,
+    });
+  }
+
+  const userId = req.user.id;
   const { email, name } = req.body;
   try {
     // Validation
@@ -42,6 +54,17 @@ export const updateUserName = async (req: Request, res: Response) => {
         errorCode: "USER_NOT_FOUND",
         errorDetails: "No user found with the provided current email",
         status: 404,
+      });
+    }
+
+    // Check if user is trying to update their own name
+    if (userId !== user.id) {
+      return sendErrorResponse({
+        res: res,
+        message: "Unauthorized",
+        errorCode: "UNAUTHORIZED",
+        errorDetails: "You are not authorized to update this user's name.",
+        status: 401,
       });
     }
 

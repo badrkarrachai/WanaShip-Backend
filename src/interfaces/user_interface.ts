@@ -34,4 +34,6 @@ export interface IUser extends Document {
     email: boolean;
     push: boolean;
   };
+  createdAt: Date;
+  updatedAt: Date;
 }

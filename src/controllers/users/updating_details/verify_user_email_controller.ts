@@ -11,9 +11,24 @@ import {
   validateRequest,
   verifyEmailValidationRules,
 } from "../../../utils/validations";
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Request user email verification
-export const requestVerifyUserEmail = async (req, res) => {
+export const requestVerifyUserEmail = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  if (!req.user) {
+    return sendErrorResponse({
+      res: res,
+      message: "Unauthorized",
+      errorCode: "UNAUTHORIZED",
+      errorDetails: "User authentication is required for this action.",
+      status: 401,
+    });
+  }
+
+  const userId = req.user.id;
   const { email } = req.body;
   try {
     // Validation
@@ -44,6 +59,17 @@ export const requestVerifyUserEmail = async (req, res) => {
         errorCode: "USER_NOT_FOUND",
         errorDetails: "No user found with the provided email.",
         status: 404,
+      });
+    }
+
+    // Check if user is the owner of the email
+    if (user.id !== userId) {
+      return sendErrorResponse({
+        res: res,
+        message: "Unauthorized",
+        errorCode: "UNAUTHORIZED",
+        errorDetails: "You are not authorized to verify this email.",
+        status: 401,
       });
     }
 
@@ -82,7 +108,21 @@ export const requestVerifyUserEmail = async (req, res) => {
 };
 
 // Verify user email via OTP
-export const verifyUserEmailViaOTP = async (req: Request, res: Response) => {
+export const verifyUserEmailViaOTP = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  if (!req.user) {
+    return sendErrorResponse({
+      res: res,
+      message: "Unauthorized",
+      errorCode: "UNAUTHORIZED",
+      errorDetails: "User authentication is required for this action.",
+      status: 401,
+    });
+  }
+
+  const userId = req.user.id;
   const { email, otp } = req.body;
   try {
     // Validation
@@ -113,6 +153,17 @@ export const verifyUserEmailViaOTP = async (req: Request, res: Response) => {
         errorCode: "USER_NOT_FOUND",
         errorDetails: "No user found with the provided email.",
         status: 404,
+      });
+    }
+
+    // Check if user is the owner of the email
+    if (user.id !== userId) {
+      return sendErrorResponse({
+        res: res,
+        message: "Unauthorized",
+        errorCode: "UNAUTHORIZED",
+        errorDetails: "You are not authorized to verify this email.",
+        status: 401,
       });
     }
 

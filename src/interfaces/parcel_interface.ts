@@ -15,4 +15,6 @@ export interface IParcel extends Document {
   reshipperSentDate?: Date;
   status: string;
   referanceId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

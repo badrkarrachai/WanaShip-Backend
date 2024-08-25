@@ -36,7 +36,9 @@ export const login = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Find the user by sanitized email
-    const user = await User.findOne({ email: sanitizedEmail });
+    const user = await User.findOne({ email: sanitizedEmail }).populate(
+      "avatar"
+    );
     if (!user) {
       return sendErrorResponse({
         res: res,

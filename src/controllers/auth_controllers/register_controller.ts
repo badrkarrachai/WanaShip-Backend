@@ -45,7 +45,9 @@ export const register = async (req: Request, res: Response) => {
     const sanitizedName = validator.escape(name);
 
     // Check if the user already exists
-    const existingUser = await User.findOne({ email: sanitizedEmail });
+    const existingUser = await User.findOne({ email: sanitizedEmail }).populate(
+      "avatar"
+    );
     if (existingUser) {
       return sendErrorResponse({
         res,

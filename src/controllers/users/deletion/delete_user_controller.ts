@@ -6,13 +6,10 @@ import {
   sendErrorResponse,
 } from "../../../utils/response_handler";
 import {
-  deleteAccountValidationRules,
+  requesteleteAccountValidationRules,
   validateRequest,
 } from "../../../utils/validations";
-
-interface AuthRequest extends Request {
-  user?: JwtPayload["user"];
-}
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Delete user
 export const deleteUser = async (req: AuthRequest, res: Response) => {
@@ -46,7 +43,7 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     const validationErrors = await validateRequest(
       req,
       res,
-      deleteAccountValidationRules
+      requesteleteAccountValidationRules
     );
     if (validationErrors !== "validation successful") {
       return sendErrorResponse({

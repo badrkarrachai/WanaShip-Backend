@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import auth from "../middlewares/auth";
+import auth from "../middlewares/auth_middleware";
 import {
   requestUpdateUserEmail,
   updateUserEmailViaOTP,
@@ -13,6 +13,10 @@ import {
   requestVerifyUserEmail,
   verifyUserEmailViaOTP,
 } from "../../controllers/users/updating_details/verify_user_email_controller";
+import {
+  removeUserProfilePicture,
+  updateUserProfilePicture,
+} from "../../controllers/users/updating_details/update_user_avatar_controller";
 
 const router = Router();
 
@@ -24,5 +28,7 @@ router.get("/delete-user", auth, deleteUser);
 router.get("/recover-user", auth, recoverUser);
 router.post("/request-verify-user-email", auth, requestVerifyUserEmail);
 router.post("/verify-user-email", auth, verifyUserEmailViaOTP);
+router.put("/update-profile-picture", auth, updateUserProfilePicture);
+router.delete("/delete-profile-picture", auth, removeUserProfilePicture);
 
 export default router;

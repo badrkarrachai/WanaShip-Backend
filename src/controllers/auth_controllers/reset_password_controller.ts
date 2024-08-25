@@ -93,7 +93,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Get the user with the email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("avatar");
     if (!user) {
       return sendErrorResponse({
         res: res,

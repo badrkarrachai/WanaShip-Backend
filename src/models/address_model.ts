@@ -3,6 +3,7 @@ import { IAddress } from "../interfaces/address_interface";
 
 const addressSchema = new Schema<IAddress>(
   {
+    country: { type: String, required: true },
     addressLine1: { type: String, required: true },
     addressLine2: { type: String },
     city: { type: String, required: true },
