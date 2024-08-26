@@ -12,6 +12,7 @@ if (envFound.error) {
 export default {
   app: {
     port: parseInt(process.env.PORT, 10),
+    baseUrl: process.env.BASE_URL,
     apiPrefix: process.env.API_PREFIX,
     appName: process.env.APP_NAME,
     issuer: process.env.ISSUER,
@@ -43,5 +44,9 @@ export default {
   },
   bcrypt: {
     rounds: parseInt(process.env.BCRYPT_ROUNDS, 10),
+  },
+  google: {
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   },
 };

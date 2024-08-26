@@ -34,6 +34,13 @@ export interface IUser extends Document {
     email: boolean;
     push: boolean;
   };
+  googleId?: string;
+  discordId: string;
+  appleId: string;
+  authProvider: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiresAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
