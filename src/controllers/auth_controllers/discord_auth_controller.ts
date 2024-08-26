@@ -117,12 +117,7 @@ export const discordAuthCallback = (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        avatar: user.avatar
-          ? {
-              id: user.avatar.id,
-              url: user.avatar.url,
-            }
-          : null,
+        avatar: user.avatar ? user.avatar : null,
         isActivated: user.isActivated,
         preferences: user.preferences,
         notificationSettings: user.notificationSettings,
