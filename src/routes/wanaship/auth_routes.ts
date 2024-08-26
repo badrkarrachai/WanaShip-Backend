@@ -12,6 +12,10 @@ import {
   googleAuth,
   googleAuthCallback,
 } from "../../controllers/auth_controllers/google_auth_controller";
+import {
+  discordAuth,
+  discordAuthCallback,
+} from "../../controllers/auth_controllers/discord_auth_controller";
 
 const router = Router();
 
@@ -26,5 +30,7 @@ router.post("/verify-otp", rateLimiterGeneral, verifyOTP);
 router.post("/reset-password", rateLimiterGeneral, resetPassword);
 router.get("/google", googleAuth);
 router.get("/google/callback", googleAuthCallback);
+router.get("/discord", discordAuth);
+router.get("/discord/callback", discordAuthCallback);
 
 export default router;
