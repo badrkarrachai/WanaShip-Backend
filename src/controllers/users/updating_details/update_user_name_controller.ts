@@ -12,16 +12,6 @@ import {
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 export const updateUserName = async (req: AuthRequest, res: Response) => {
-  if (!req.user) {
-    return sendErrorResponse({
-      res: res,
-      message: "Unauthorized",
-      errorCode: "UNAUTHORIZED",
-      errorDetails: "User authentication is required for this action.",
-      status: 401,
-    });
-  }
-
   const userId = req.user.id;
   const { email, name } = req.body;
   try {

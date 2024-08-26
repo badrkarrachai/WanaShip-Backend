@@ -18,16 +18,6 @@ export const uploadImage = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) {
-    return sendErrorResponse({
-      res: res,
-      message: "Unauthorized",
-      errorCode: "UNAUTHORIZED",
-      errorDetails: "User authentication is required for this action.",
-      status: 401,
-    });
-  }
-
   const userId = req.user.id;
 
   // Handle multer errors
