@@ -16,6 +16,7 @@ import {
   validateRequest,
 } from "../../utils/validations";
 import { IUser } from "../../interfaces/user_interface";
+import { formatUserData } from "../../utils/user_utils";
 
 // Registration with email verification false
 export const register = async (req: Request, res: Response) => {
@@ -78,17 +79,7 @@ export const register = async (req: Request, res: Response) => {
     await sendWelcomeEmail(newUser);
 
     // Prepare user data for response
-    const userData = {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      avatar: newUser.avatar,
-      isActivated: newUser.isActivated,
-      preferences: newUser.preferences,
-      notificationSettings: newUser.notificationSettings,
-      messages: messagesForUser,
-    };
+    const userData = formatUserData(newUser, messagesForUser);
 
     // Generate JWT token
     const token = generateToken(newUser.id, newUser.role);

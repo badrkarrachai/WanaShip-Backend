@@ -23,6 +23,8 @@ const userSchema = new Schema<IUser>(
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
     reasonForDeletion: { type: [String], default: [] },
+    awayDateStart: { type: Date },
+    awayDateEnd: { type: Date },
     preferences: {
       currency: { type: String, default: "USD" },
       language: { type: String, default: "en" },

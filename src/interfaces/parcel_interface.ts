@@ -2,6 +2,7 @@ import { Document, Types } from "mongoose";
 import { IImages } from "./image_interface";
 
 export interface IParcel extends Document {
+  userId: Types.ObjectId;
   name: string;
   description: string;
   price: number;

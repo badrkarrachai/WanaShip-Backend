@@ -1,5 +1,4 @@
 import { Document, Types } from "mongoose";
-import { IAddress } from "./address_interface";
 import { IImages } from "./image_interface";
 
 export interface IUser extends Document {
@@ -8,7 +7,7 @@ export interface IUser extends Document {
   emailVerified: boolean;
   password: string;
   avatar?: IImages;
-  addresses?: IAddress[];
+  addresses?: Types.ObjectId[];
   isActivated: boolean;
   role: string;
   lastLogin?: Date;
@@ -19,6 +18,8 @@ export interface IUser extends Document {
   isDeleted: boolean;
   deletedAt?: Date;
   reasonForDeletion?: string[];
+  awayDateStart?: Date;
+  awayDateEnd?: Date;
   preferences: {
     currency: string;
     language: string;

@@ -1,6 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface IAddress extends Document {
+  userId: Types.ObjectId;
   country: string;
   addressLine1: string;
   addressLine2?: string;

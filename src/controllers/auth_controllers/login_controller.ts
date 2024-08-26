@@ -9,6 +9,8 @@ import {
 } from "../../utils/response_handler";
 import { loginValidationRules, validateRequest } from "../../utils/validations";
 import config from "../../config";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
+import { formatUserData } from "../../utils/user_utils";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -48,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if the account is activated and not deleted
+    // Check if the account is activated
     if (!user.isActivated) {
       return sendErrorResponse({
         res: res,
@@ -60,37 +62,23 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Check if the account is deleted and if it's been more than config.app.recoveryPeriod days
-    if (user.isDeleted && user.deletedAt) {
-      // Current date
-      const now = new Date();
-
-      // Recovery period end date (config.app.recoveryPeriod days after `deletedAt`)
-      const recoveryEndDate = new Date(
-        user.deletedAt.getTime() +
-          config.app.recoveryPeriod * 24 * 60 * 60 * 1000
-      );
-
-      // Calculate the number of days left in the recovery period
-      const daysLeftInRecoveryPeriod = Math.ceil(
-        (recoveryEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      if (daysLeftInRecoveryPeriod > 0) {
-        messagesForUser.push(
-          `Your account is in the recovery period. You have ${daysLeftInRecoveryPeriod} day${
-            daysLeftInRecoveryPeriod !== 1 ? "s" : ""
-          } left to reactivate it.`
-        );
-      } else {
-        return sendErrorResponse({
-          res: res,
-          message: "Account has been permanently deleted",
-          errorCode: "ACCOUNT_DELETED",
-          errorDetails:
-            "The 15-day recovery period has ended. Your account is scheduled for permanent deletion.",
-          status: 403,
-        });
-      }
+    const recoveryMessage = checkAccountRecoveryStatus(
+      user,
+      config.app.recoveryPeriod,
+      res
+    );
+    if (recoveryMessage === "deleted") {
+      return sendErrorResponse({
+        res: res,
+        message: "Account has been permanently deleted",
+        errorCode: "ACCOUNT_DELETED",
+        errorDetails:
+          "The recovery period has ended. Your account is scheduled for permanent deletion.",
+        status: 403,
+      });
+    }
+    if (recoveryMessage) {
+      messagesForUser.push(recoveryMessage);
     }
 
     // Check password
@@ -113,7 +101,8 @@ export const login = async (req: Request, res: Response) => {
       messagesForUser.push(`Please verify your email to use full features.`);
     }
 
-    // Update last login timestamp
+    // Update last login timestamp and auth provider
+    user.authProvider = "local";
     user.lastLogin = new Date();
     await user.save();
 
@@ -121,17 +110,7 @@ export const login = async (req: Request, res: Response) => {
     const token = generateToken(user.id, user.role);
 
     // Prepare user data for response
-    const userData = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      isActivated: user.isActivated,
-      preferences: user.preferences,
-      notificationSettings: user.notificationSettings,
-      messages: messagesForUser,
-    };
+    const userData = formatUserData(user, messagesForUser);
 
     // Send response
     return sendSuccessResponse({

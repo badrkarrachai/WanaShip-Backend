@@ -4,6 +4,7 @@ import Image from "./image_model";
 
 const parcelSchema = new Schema<IParcel>(
   {
+    userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },

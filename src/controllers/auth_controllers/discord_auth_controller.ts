@@ -10,6 +10,8 @@ import {
 } from "../../utils/response_handler";
 import config from "../../config";
 import bcrypt from "bcrypt";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
+import { formatUserData } from "../../utils/user_utils";
 
 passport.use(
   new DiscordStrategy(
@@ -30,6 +32,7 @@ passport.use(
           user.name = user.name || profile.username;
           user.emailVerified = true;
           user.authProvider = "discord";
+          user.lastLogin = new Date();
 
           if (!user.avatar && profile.avatar) {
             const newAvatar = new Image({
@@ -110,19 +113,47 @@ export const discordAuthCallback = (req: Request, res: Response) => {
     }
 
     try {
+      let messagesForUser: string[] = [];
+
+      // Check if the account is activated
+      if (!user.isActivated) {
+        return sendErrorResponse({
+          res: res,
+          message: "Your account is disabled",
+          errorCode: "ACCOUNT_DISABLED",
+          errorDetails:
+            "Account is not activated, please contact the support team.",
+        });
+      }
+
+      // check is user email verified
+      if (!user.emailVerified) {
+        messagesForUser.push(`Please verify your email to use full features.`);
+      }
+
+      // Check if the account is deleted and if it's been more than config.app.recoveryPeriod days
+      const recoveryMessage = checkAccountRecoveryStatus(
+        user,
+        config.app.recoveryPeriod,
+        res
+      );
+      if (recoveryMessage === "deleted") {
+        return sendErrorResponse({
+          res: res,
+          message: "Account has been permanently deleted",
+          errorCode: "ACCOUNT_DELETED",
+          errorDetails:
+            "The recovery period has ended. Your account is scheduled for permanent deletion.",
+          status: 403,
+        });
+      }
+      if (recoveryMessage) {
+        messagesForUser.push(recoveryMessage);
+      }
+
       const token = generateToken(user.id, user.role);
 
-      const userData = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar ? user.avatar : null,
-        isActivated: user.isActivated,
-        preferences: user.preferences,
-        notificationSettings: user.notificationSettings,
-        authProvider: user.authProvider,
-      };
+      const userData = formatUserData(user, messagesForUser);
 
       // Update last login
       user.lastLogin = new Date();
