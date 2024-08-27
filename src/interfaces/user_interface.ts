@@ -1,17 +1,15 @@
 import { Document, Types } from "mongoose";
+import { IImages } from "./image_interface";
 
 export interface IUser extends Document {
   name: string;
   email: string;
   emailVerified: boolean;
   password: string;
-  avatar?: string;
+  avatar?: IImages;
+  addresses?: Types.ObjectId[];
   isActivated: boolean;
   role: string;
-  incomes: Types.ObjectId[];
-  expenses: Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
   lastLogin?: Date;
   twoFactorSecret?: string;
   twoFactorEnabled: boolean;
@@ -20,6 +18,8 @@ export interface IUser extends Document {
   isDeleted: boolean;
   deletedAt?: Date;
   reasonForDeletion?: string[];
+  awayDateStart?: Date;
+  awayDateEnd?: Date;
   preferences: {
     currency: string;
     language: string;
@@ -35,4 +35,13 @@ export interface IUser extends Document {
     email: boolean;
     push: boolean;
   };
+  googleId?: string;
+  discordId: string;
+  appleId: string;
+  authProvider: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

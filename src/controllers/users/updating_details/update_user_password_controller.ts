@@ -1,62 +1,37 @@
 import { Request, Response } from "express";
-import User from "../../../models/users";
+import User from "../../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import config from "../../../config";
-import { sendErrorResponse } from "../../../utils/response_handler";
+import { sendErrorResponse } from "../../../utils/response_handler_util";
+import {
+  updateProfilePasswordValidationRules,
+  validateRequest,
+} from "../../../utils/validations_util";
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserPassword = async (req: Request, res: Response) => {
+export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+  const userId = req.user.id;
   const { email, currentPassword, newPassword, confirmPassword } = req.body;
   try {
-    // Validate inputs
-    if (!email || !currentPassword || !newPassword) {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      updateProfilePasswordValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
-        message: "Email, current password, and new password are required",
-        errorCode: "MISSING_CREDENTIALS",
-        errorDetails:
-          "Both email, current password, and new password must be provided",
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
       });
     }
 
     // Sanitize and validate email
     const sanitizedEmail = validator.normalizeEmail(email) || "";
-
-    // Check if email is valid and length is less than 250
-    if (
-      !validator.isEmail(sanitizedEmail) ||
-      !validator.isLength(sanitizedEmail, { max: 250 })
-    ) {
-      return sendErrorResponse({
-        res: res,
-        message: "Invalid email format",
-        errorCode: "INVALID_EMAIL",
-        errorDetails:
-          "The provided email is not valid or exceeds the maximum length",
-      });
-    }
-
-    // Validate new password
-    if (newPassword.length < 8) {
-      return sendErrorResponse({
-        res: res,
-        message: "New password must be at least 8 characters long",
-        errorCode: "INVALID_PASSWORD",
-        errorDetails:
-          "The provided new password must be at least 8 characters long",
-      });
-    }
-
-    // Validate confirm password
-    if (newPassword !== confirmPassword) {
-      return sendErrorResponse({
-        res: res,
-        message: "Passwords do not match",
-        errorCode: "PASSWORD_MISMATCH",
-        errorDetails:
-          "The new password and confirmation password must be identical",
-      });
-    }
 
     // Check if user exists
     const user = await User.findOne({ email: sanitizedEmail });
@@ -67,6 +42,17 @@ export const updateUserPassword = async (req: Request, res: Response) => {
         errorCode: "USER_NOT_FOUND",
         errorDetails: "No user found with the provided email",
         status: 404,
+      });
+    }
+
+    // Check if user is trying to update their own password
+    if (userId !== user.id) {
+      return sendErrorResponse({
+        res: res,
+        message: "Unauthorized",
+        errorCode: "UNAUTHORIZED",
+        errorDetails: "You are not authorized to update this user's password.",
+        status: 401,
       });
     }
 
@@ -108,7 +94,8 @@ export const updateUserPassword = async (req: Request, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while updating the password",
+      errorDetails:
+        "An unexpected error occurred while updating the password, Please try again later.",
       status: 500,
     });
   }

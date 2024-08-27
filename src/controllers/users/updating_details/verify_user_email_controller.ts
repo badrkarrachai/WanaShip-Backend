@@ -1,31 +1,31 @@
 import { Request, Response } from "express";
 import User from "../../../models/users_model";
 import validator from "validator";
-import bcrypt from "bcrypt";
 import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../../utils/response_handler_util";
 import { sendOTP, verifyOTPLocally } from "../../../utils/otp_util";
 import {
-  updateProfileEmailValidationRules,
-  updateProfileEmailViaOTPValidationRules,
+  requestverifyEmailValidationRules,
   validateRequest,
+  verifyEmailValidationRules,
 } from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const requestUpdateUserEmail = async (
+// Request user email verification
+export const requestVerifyUserEmail = async (
   req: AuthRequest,
   res: Response
 ) => {
   const userId = req.user.id;
-  const { email, currentEmail, currentPassword } = req.body;
+  const { email } = req.body;
   try {
     // Validation
     const validationErrors = await validateRequest(
       req,
       res,
-      updateProfileEmailValidationRules
+      requestverifyEmailValidationRules
     );
     if (validationErrors !== "validation successful") {
       return sendErrorResponse({
@@ -38,101 +38,78 @@ export const requestUpdateUserEmail = async (
     }
 
     // Sanitize inputs
-    const sanitizedNewEmail = validator.normalizeEmail(email) || "";
-    const sanitizedCurrentEmail = validator.normalizeEmail(currentEmail) || "";
-    const sanitizedCurrentPassword = validator.escape(currentPassword) || "";
+    const sanitizedEmail = validator.normalizeEmail(email) || "";
 
-    // Check if new email is different from current email
-    if (sanitizedNewEmail === sanitizedCurrentEmail) {
-      return sendErrorResponse({
-        res: res,
-        message: "New email must be different",
-        errorCode: "SAME_EMAIL",
-        errorDetails: "The new email must be different from the current email",
-      });
-    }
-
-    // Check if user exists with current email
-    const user = await User.findOne({ email: sanitizedCurrentEmail });
+    // Check if user exists
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return sendErrorResponse({
         res: res,
         message: "User not found",
         errorCode: "USER_NOT_FOUND",
-        errorDetails: "No user found with the provided current email",
+        errorDetails: "No user found with the provided email.",
         status: 404,
       });
     }
 
-    // Check if user is trying to update their own email
-    if (userId !== user.id) {
+    // Check if user is the owner of the email
+    if (user.id !== userId) {
       return sendErrorResponse({
         res: res,
         message: "Unauthorized",
         errorCode: "UNAUTHORIZED",
-        errorDetails: "You are not authorized to update this user's email.",
+        errorDetails: "You are not authorized to verify this email.",
         status: 401,
       });
     }
 
-    // Check if current password is correct
-    if (!(await bcrypt.compare(sanitizedCurrentPassword, user.password))) {
+    // Check if user's email is verified
+    if (user.emailVerified) {
       return sendErrorResponse({
         res: res,
-        message: "Current password is incorrect",
-        errorCode: "INCORRECT_PASSWORD",
-        errorDetails: "The provided current password is incorrect",
+        message: "Email is already verified",
+        errorCode: "EMAIL_ALREADY_VERIFIED",
+        errorDetails: "The provided email is already verified.",
       });
     }
 
-    // Check if new email is already in use
-    const emailExists = await User.findOne({ email: sanitizedNewEmail });
-    if (emailExists) {
-      return sendErrorResponse({
-        res: res,
-        message: "Email already in use",
-        errorCode: "EMAIL_IN_USE",
-        errorDetails:
-          "The new email address is already associated with another account",
-      });
-    }
-
-    // send OTP
+    // Send OTP
     sendOTP({
       userOTP: user,
-      subjectOTP: "Email Update OTP",
+      subjectOTP: "Email Verification OTP",
     });
 
     // Send response
     return sendSuccessResponse({
       res: res,
-      message: "Email update OTP sent successfully",
+      message: "Email verification OTP sent successfully",
     });
   } catch (err) {
-    console.error("User email update error:", err);
+    console.error("Email verification error:", err);
     return sendErrorResponse({
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while processing the request",
+      errorDetails:
+        "An unexpected error occurred while verifying the email, Please try again later.",
       status: 500,
     });
   }
 };
 
-// Update user email via OTP
-export const updateUserEmailViaOTP = async (
+// Verify user email via OTP
+export const verifyUserEmailViaOTP = async (
   req: AuthRequest,
   res: Response
 ) => {
   const userId = req.user.id;
-  const { email, currentEmail, otp } = req.body;
+  const { email, otp } = req.body;
   try {
     // Validation
     const validationErrors = await validateRequest(
       req,
       res,
-      updateProfileEmailViaOTPValidationRules
+      verifyEmailValidationRules
     );
     if (validationErrors !== "validation successful") {
       return sendErrorResponse({
@@ -145,29 +122,38 @@ export const updateUserEmailViaOTP = async (
     }
 
     // Sanitize inputs
-    const sanitizedCurrentEmail = validator.normalizeEmail(currentEmail) || "";
-    const sanitizedNewEmail = validator.normalizeEmail(email) || "";
+    const sanitizedEmail = validator.normalizeEmail(email) || "";
 
-    // Get the user with the current email
-    const user = await User.findOne({ email: sanitizedCurrentEmail });
+    // Get the user with the provided email
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return sendErrorResponse({
         res: res,
         message: "User not found",
         errorCode: "USER_NOT_FOUND",
-        errorDetails: "No user found with the provided current email",
+        errorDetails: "No user found with the provided email.",
         status: 404,
       });
     }
 
-    // Check if user is trying to update their own email
-    if (userId !== user.id) {
+    // Check if user is the owner of the email
+    if (user.id !== userId) {
       return sendErrorResponse({
         res: res,
         message: "Unauthorized",
         errorCode: "UNAUTHORIZED",
-        errorDetails: "You are not authorized to update this user's email.",
+        errorDetails: "You are not authorized to verify this email.",
         status: 401,
+      });
+    }
+
+    // Check if user's email is verified
+    if (user.emailVerified) {
+      return sendErrorResponse({
+        res: res,
+        message: "Email is already verified",
+        errorCode: "EMAIL_ALREADY_VERIFIED",
+        errorDetails: "The provided email is already verified.",
       });
     }
 
@@ -190,29 +176,23 @@ export const updateUserEmailViaOTP = async (
       });
     }
 
-    // Update user email
-    user.email = sanitizedNewEmail;
+    // Update user emailVerified to true
     user.emailVerified = true;
-    user.resetPasswordOTP = undefined;
-    user.resetPasswordOTPExpires = undefined;
     await user.save();
 
-    // OTP is valid
+    // Send response
     return sendSuccessResponse({
       res: res,
-      message: "Email updated successfully",
-      data: {
-        newEmail: sanitizedNewEmail,
-      },
+      message: "Email verified successfully",
     });
   } catch (err) {
-    console.error("OTP verification error:", err);
+    console.error("Email verification error:", err);
     return sendErrorResponse({
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
       errorDetails:
-        "An unexpected error occurred while updating the email, Please try again later.",
+        "An unexpected error occurred while verifying the email, Please try again later.",
       status: 500,
     });
   }

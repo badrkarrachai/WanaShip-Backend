@@ -1,50 +1,39 @@
 import { Request, Response } from "express";
-import User from "../../../models/users";
+import User from "../../../models/users_model";
 import validator from "validator";
 import {
   sendErrorResponse,
   sendSuccessResponse,
-} from "../../../utils/response_handler";
+} from "../../../utils/response_handler_util";
+import {
+  updateProfileNameValidationRules,
+  validateRequest,
+} from "../../../utils/validations_util";
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserName = async (req: Request, res: Response) => {
+export const updateUserName = async (req: AuthRequest, res: Response) => {
+  const userId = req.user.id;
   const { email, name } = req.body;
   try {
-    // Validate inputs
-    if (!email || !name) {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      updateProfileNameValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
-        message: "Email and name are required",
-        errorCode: "MISSING_CREDENTIALS",
-        errorDetails: "Both email and name must be provided",
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
       });
     }
 
     // Sanitize and validate inputs
     const sanitizedName = validator.trim(validator.escape(name));
     const sanitizedEmail = validator.normalizeEmail(email) || "";
-
-    // Check if email is valid and length is less than 250
-    if (
-      !validator.isEmail(sanitizedEmail) ||
-      !validator.isLength(sanitizedEmail, { max: 250 })
-    ) {
-      return sendErrorResponse({
-        res: res,
-        message: "Invalid email format",
-        errorCode: "INVALID_EMAIL",
-        errorDetails:
-          "The provided email is not valid or exceeds the maximum length",
-      });
-    }
-
-    if (!validator.isLength(sanitizedName, { min: 2, max: 50 })) {
-      return sendErrorResponse({
-        res: res,
-        message: "Name must be between 2 and 50 characters",
-        errorCode: "INVALID_NAME",
-        errorDetails: "The provided name must be between 2 and 50 characters",
-      });
-    }
 
     // Check if user exists
     const user = await User.findOne({ email: sanitizedEmail });
@@ -55,6 +44,17 @@ export const updateUserName = async (req: Request, res: Response) => {
         errorCode: "USER_NOT_FOUND",
         errorDetails: "No user found with the provided current email",
         status: 404,
+      });
+    }
+
+    // Check if user is trying to update their own name
+    if (userId !== user.id) {
+      return sendErrorResponse({
+        res: res,
+        message: "Unauthorized",
+        errorCode: "UNAUTHORIZED",
+        errorDetails: "You are not authorized to update this user's name.",
+        status: 401,
       });
     }
 
@@ -84,7 +84,8 @@ export const updateUserName = async (req: Request, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while updating the name",
+      errorDetails:
+        "An unexpected error occurred while updating the name, Please try again later.",
       status: 500,
     });
   }

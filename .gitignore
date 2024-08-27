@@ -120,3 +120,7 @@ $RECYCLE.BIN/
 # Others
 lib/
 data/
+
+# Uploaded images
+/src/uploads/*
+!.gitignore

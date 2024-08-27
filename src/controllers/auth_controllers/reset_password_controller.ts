@@ -1,35 +1,38 @@
 import { Request, Response } from "express";
-import User from "../../models/users";
-import { generateToken } from "../../utils/jwt";
-import { sendEmail } from "../../utils/email";
-import { readHtmlTemplate } from "../../utils/read_html";
+import User from "../../models/users_model";
+import { generateToken } from "../../utils/jwt_util";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { generateOTP } from "../../utils/generate_otp";
-import { verifyOTPLocally } from "./verify_otp";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import { check, validationResult } from "express-validator";
+import { sendOTP, verifyOTPLocally } from "../../utils/otp_util";
+import {
+  requestPasswordResetValidationRules,
+  resetPasswordValidationRules,
+  validateRequest,
+} from "../../utils/validations_util";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
 // Request password reset
 export const requestPasswordReset = async (req: Request, res: Response) => {
   const { email } = req.body;
   try {
     // Validation
-    await check("email", "Please include a valid email")
-      .isEmail()
-      .isLength({ max: 250 })
-      .run(req);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const errorDetails = errors.array()[0].msg;
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      requestPasswordResetValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
+        res,
         message: "Invalid input",
         errorCode: "INVALID_INPUT",
-        errorDetails: errorDetails,
+        errorDetails: validationErrors,
         status: 400,
       });
     }
@@ -45,33 +48,15 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate 6-digit OTP
-    const { hashedOtp, otp } = await generateOTP();
-    user.resetPasswordOTP = hashedOtp;
-    user.resetPasswordOTPExpires = new Date(
-      Date.now() + config.otp.expiration * 60 * 1000
-    );
-    await user.save();
-
-    // Read HTML template and replace placeholders
-    let htmlTemplate = readHtmlTemplate("request_otp.html");
-    htmlTemplate = htmlTemplate.replace("{{OTP}}", otp);
-    htmlTemplate = htmlTemplate.replace(
-      "{{EXP-OTP}}",
-      config.otp.expiration.toString()
-    );
-
-    // Send email
-    sendEmail({
-      to: user.email,
-      subject: "Password Reset OTP",
-      html: htmlTemplate,
-      text: "",
+    // send OTP
+    sendOTP({
+      userOTP: user,
+      subjectOTP: "Reset Password OTP",
     });
 
     return sendSuccessResponse({
       res: res,
-      message: "Password reset OTP sent to your email",
+      message: "Reset password OTP sent to your email",
       status: 200,
     });
   } catch (err) {
@@ -89,40 +74,20 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 
 // Reset password
 export const resetPassword = async (req: Request, res: Response) => {
-  const { email, otp, newPassword, confirmPassword } = req.body;
+  const { email, otp, newPassword } = req.body;
   try {
     // Validation
-    await check("email", "Please include a valid email")
-      .isEmail()
-      .isLength({ max: 250 })
-      .run(req);
-    await check("otp", "otp is required")
-      .exists()
-      .isString()
-      .isLength({ min: 6, max: 6 })
-      .run(req);
-    await check(
-      "newPassword",
-      "Password is required with a minimum length of 6 characters"
-    )
-      .isLength({ min: 6, max: 250 })
-      .run(req);
-    await check("confirmPassword", "Passwords do not match")
-      .custom((value, { req }) => {
-        if (value !== req.body.newPassword) {
-          throw new Error("Passwords do not match");
-        }
-        return true;
-      })
-      .run(req);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const errorDetails = errors.array()[0].msg;
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      resetPasswordValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
+        res,
         message: "Invalid input",
         errorCode: "INVALID_INPUT",
-        errorDetails: errorDetails,
+        errorDetails: validationErrors,
         status: 400,
       });
     }
@@ -130,7 +95,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Get the user with the email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("avatar");
     if (!user) {
       return sendErrorResponse({
         res: res,
@@ -143,12 +108,21 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     // Verify OTP locally
     const isValid = await verifyOTPLocally(user, otp);
+    if (isValid === "OTP_EXPIRED") {
+      return sendErrorResponse({
+        res: res,
+        message: "OTP expired",
+        errorCode: "EXPIRED_OTP",
+        errorDetails: "The provided OTP is expired.",
+        status: 400,
+      });
+    }
     if (!isValid) {
       return sendErrorResponse({
         res: res,
-        message: "Invalid or expired OTP",
+        message: "Invalid OTP",
         errorCode: "INVALID_OTP",
-        errorDetails: "The provided OTP is not valid or has expired",
+        errorDetails: "The provided OTP is not valid.",
         status: 400,
       });
     }
@@ -170,49 +144,41 @@ export const resetPassword = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if the account is deleted and if it's been more than 15 days
-    if (user.isDeleted && user.deletedAt) {
-      const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
-      if (user.deletedAt.getTime() < fifteenDaysAgo.getTime()) {
-        return sendErrorResponse({
-          res: res,
-          message: "Account has been permanently deleted",
-          errorCode: "ACCOUNT_DELETED",
-          errorDetails: "This account has been permanently deleted",
-          status: 403,
-        });
-      } else {
-        const daysLeft = Math.ceil(
-          (user.deletedAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-        );
-        messagesForUser.push(
-          `Your account is scheduled for deletion. You have ${daysLeft} day${
-            daysLeft !== 1 ? "s" : ""
-          } left to reactivate it.`
-        );
-      }
+    // Check if the account is deleted and if it's been more than config.app.recoveryPeriod days
+    const recoveryMessage = checkAccountRecoveryStatus(
+      user,
+      config.app.recoveryPeriod,
+      res
+    );
+    if (recoveryMessage === "deleted") {
+      return sendErrorResponse({
+        res: res,
+        message: "Account has been permanently deleted",
+        errorCode: "ACCOUNT_DELETED",
+        errorDetails:
+          "The recovery period has ended. Your account is scheduled for permanent deletion.",
+        status: 403,
+      });
+    }
+    if (recoveryMessage) {
+      messagesForUser.push(recoveryMessage);
+    }
+
+    // check is user email verified
+    if (!user.emailVerified) {
+      messagesForUser.push(`Please verify your email to use full features.`);
     }
 
     // Update last login
+    user.authProvider = "local";
     user.lastLogin = new Date();
     await user.save();
 
     // Generate JWT
     const token = generateToken(user.id, user.role);
 
-    messagesForUser.push("Your password has been successfully reset.");
-
-    const userData = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      isActivated: user.isActivated,
-      preferences: user.preferences,
-      notificationSettings: user.notificationSettings,
-      messages: messagesForUser,
-    };
+    // Prepare user data for response
+    const userData = formatUserData(user, messagesForUser);
 
     return sendSuccessResponse({
       res: res,
@@ -229,7 +195,8 @@ export const resetPassword = async (req: Request, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred during password reset",
+      errorDetails:
+        "An unexpected error occurred during password reset, Please try again later.",
       status: 500,
     });
   }

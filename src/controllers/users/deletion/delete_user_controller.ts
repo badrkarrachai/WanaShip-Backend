@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
-import User from "../../../models/users";
-import { JwtPayload } from "../../../interfaces/jwt-payload";
+import User from "../../../models/users_model";
+import { JwtPayload } from "../../../interfaces/jwt_payload_interface";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
-
-interface AuthRequest extends Request {
-  user?: JwtPayload["user"];
-}
+} from "../../../utils/response_handler_util";
+import {
+  requesteleteAccountValidationRules,
+  validateRequest,
+} from "../../../utils/validations_util";
+import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Delete user
 export const deleteUser = async (req: AuthRequest, res: Response) => {
@@ -38,13 +39,19 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Validate reasons
-    if (!Array.isArray(reasons)) {
+    // Validation
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      requesteleteAccountValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
-        message: "Invalid reasons format",
-        errorCode: "INVALID_REASONS",
-        errorDetails: "Reasons must be provided as an array",
+        res,
+        message: "Invalid input",
+        errorCode: "INVALID_INPUT",
+        errorDetails: validationErrors,
+        status: 400,
       });
     }
 
@@ -83,7 +90,8 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
       res: res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred while deleting the user",
+      errorDetails:
+        "An unexpected error occurred while deleting the user, Please try again later.",
       status: 500,
     });
   }

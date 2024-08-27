@@ -1,135 +1,117 @@
 import { Request, Response } from "express";
-import User from "../../models/users";
+import User from "../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { sendEmail } from "../../utils/email";
-import { readHtmlTemplate } from "../../utils/read_html";
-import { generateToken } from "../../utils/jwt";
+import { sendEmail } from "../../utils/email_sender_util";
+import { readHtmlTemplate } from "../../utils/read_html_util";
+import { generateToken } from "../../utils/jwt_util";
 import config from "../../config";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
-import { check, validationResult } from "express-validator";
+} from "../../utils/response_handler_util";
+import { body, validationResult } from "express-validator";
+import {
+  registrationValidationRules,
+  validateRequest,
+} from "../../utils/validations_util";
+import { IUser } from "../../interfaces/user_interface";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
+// Registration with email verification false
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password, confirmPassword } = req.body;
-
   try {
+    let messagesForUser: string[] = [];
+
     // Validation
-    await check("name", "Name is required")
-      .not()
-      .isEmpty()
-      .isLength({ min: 2, max: 50 })
-      .run(req);
-    await check("email", "Please include a valid email")
-      .isEmail()
-      .isLength({ max: 250 })
-      .run(req);
-    await check(
-      "password",
-      "Password is required with a minimum length of 6 characters"
-    )
-      .isLength({ min: 6, max: 250 })
-      .run(req);
-    await check("confirmPassword", "Passwords do not match")
-      .custom((value, { req }) => {
-        if (value !== req.body.password) {
-          throw new Error("Passwords do not match");
-        }
-        return true;
-      })
-      .run(req);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const errorDetails = errors.array()[0].msg;
+    const validationErrors = await validateRequest(
+      req,
+      res,
+      registrationValidationRules
+    );
+    if (validationErrors !== "validation successful") {
       return sendErrorResponse({
-        res: res,
+        res,
         message: "Invalid input",
         errorCode: "INVALID_INPUT",
-        errorDetails: errorDetails,
+        errorDetails: validationErrors,
         status: 400,
       });
     }
+    // Get the data from the request body
+    const { name, email, password } = req.body;
 
-    // Initialize messages array
-    let messagesForUser: string[] = [];
-
-    // Sanitize inputs
+    // Sanitize the email and name
     const sanitizedEmail = validator.normalizeEmail(email) || "";
     const sanitizedName = validator.escape(name);
-    const sanitizedPassword = validator.escape(password);
 
-    // Check if user already exists
-    let user = await User.findOne({ email: sanitizedEmail });
-    if (user) {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email: sanitizedEmail }).populate(
+      "avatar"
+    );
+    if (existingUser) {
       return sendErrorResponse({
-        res: res,
+        res,
         message: "User already exists",
         errorCode: "USER_ALREADY_EXISTS",
-        errorDetails: "A user with this email address is already registered",
+        errorDetails: "A user with this email address is already registered.",
         status: 400,
       });
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(config.bcrypt.rounds);
-    const hashedPassword = await bcrypt.hash(sanitizedPassword, salt);
+    const hashedPassword = await bcrypt.hash(password, config.bcrypt.rounds);
 
-    // Create new user
-    user = new User({
+    // Create a new user
+    const newUser = new User({
       name: sanitizedName,
       email: sanitizedEmail,
       password: hashedPassword,
-      isActivated: true, // Direct activation
     });
+    await newUser.save();
 
-    await user.save();
+    // check is user email verified
+    if (!newUser.emailVerified) {
+      messagesForUser.push(`Please verify your email to use full features.`);
+    }
 
-    // Send a welcome email
-    let htmlTemplate = readHtmlTemplate("welcome_to.html");
-    htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
-
-    sendEmail({
-      to: user.email,
-      subject: `Welcome to ${config.app.appName}!`,
-      html: htmlTemplate,
-      text: "",
-    });
+    // Send welcome email to the user
+    await sendWelcomeEmail(newUser);
 
     // Prepare user data for response
-    const userData = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      isActivated: user.isActivated,
-      preferences: user.preferences,
-      notificationSettings: user.notificationSettings,
-      messages: messagesForUser,
-    };
+    const userData = formatUserData(newUser, messagesForUser);
 
     // Generate JWT token
-    const token = generateToken(user.id, user.role);
+    const token = generateToken(newUser.id, newUser.role);
 
-    // Send success response
-    return sendSuccessResponse(
-      {
-        res: res,
-        message: "User registered successfully",
-        data: { token, user: userData },
-        status: 201,
-      } // HTTP status 201 for resource creation
-    );
+    // Send response
+    return sendSuccessResponse({
+      res,
+      message: "registration successful",
+      data: { token, user: userData },
+      status: 201,
+    });
   } catch (err) {
     console.error("Registration error:", err);
     return sendErrorResponse({
-      res: res,
+      res,
       message: "Server error",
       errorCode: "SERVER_ERROR",
-      errorDetails: "An unexpected error occurred during registration",
+      errorDetails: "An unexpected error occurred. Please try again later.",
       status: 500,
     });
   }
 };
+
+// Send welcome email to the user
+async function sendWelcomeEmail(user: IUser) {
+  let htmlTemplate = readHtmlTemplate("welcome_to.html");
+  htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
+
+  sendEmail({
+    to: user.email,
+    subject: `Welcome to ${config.app.appName}!`,
+    html: htmlTemplate,
+    text: "",
+  });
+}

@@ -6,8 +6,18 @@ import {
   requestPasswordReset,
   resetPassword,
 } from "../../controllers/auth_controllers/reset_password_controller";
-import { rateLimiterGeneral } from "../../utils/rate_limiter";
+import { rateLimiterGeneral } from "../../utils/rate_limiter_util";
 import { verifyOTP } from "../../controllers/auth_controllers/verify_otp";
+import {
+  googleAuth,
+  googleAuthCallback,
+} from "../../controllers/auth_controllers/google_auth_controller";
+import {
+  discordAuth,
+  discordAuthCallback,
+} from "../../controllers/auth_controllers/discord_auth_controller";
+import { me } from "../../controllers/auth_controllers/me_controller";
+import auth from "../middlewares/auth_middleware";
 
 const router = Router();
 
@@ -20,5 +30,10 @@ router.post(
 );
 router.post("/verify-otp", rateLimiterGeneral, verifyOTP);
 router.post("/reset-password", rateLimiterGeneral, resetPassword);
+router.get("/google", rateLimiterGeneral, googleAuth);
+router.get("/google/callback", rateLimiterGeneral, googleAuthCallback);
+router.get("/discord", rateLimiterGeneral, discordAuth);
+router.get("/discord/callback", rateLimiterGeneral, discordAuthCallback);
+router.get("/me", auth, me);
 
 export default router;

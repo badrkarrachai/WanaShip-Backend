@@ -4,13 +4,15 @@ import cors from "cors";
 import morgan from "morgan";
 import config from "../config";
 import indexRouter from "../routes";
-import authRouter from "../routes/wanaship/auth";
+import authRouter from "../routes/wanaship/auth_routes";
 import userRouter from "../routes/wanaship/users_routes";
 import {
   notFoundHandler,
   globalErrorHandler,
-} from "../routes/middlewares/errors";
+} from "../routes/middlewares/errors_middleware";
 import type { Express } from "express";
+import path from "path";
+import imageRouter from "../routes/wanaship/image_routes";
 
 export default async function ({ app }: { app: Express }) {
   // Status checkpoints
@@ -31,10 +33,14 @@ export default async function ({ app }: { app: Express }) {
   app.use(express.urlencoded({ extended: false }));
   app.use(morgan(config.logs.morgan));
 
+  // Serve static files from the 'uploads' directory
+  app.use(
+    `${config.app.apiPrefix}/images`,
+    express.static(path.join(__dirname, "../uploads"))
+  );
+
   // Routes
   app.use(config.app.apiPrefix, indexRouter);
-  app.use("/auth", authRouter);
-  app.use("/users", userRouter);
 
   // Error handlers
   app.use(notFoundHandler);
