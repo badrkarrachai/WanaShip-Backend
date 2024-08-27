@@ -56,33 +56,33 @@ npm install
 
 3. **Set up environment variables**
 Create a `.env` file in the root directory and add the following:
-- **PORT**: `3000`
-- **BASE_URL**: `http://localhost:3000`
-- **API_PREFIX**: `/wanaship/dev`
-- **APP_VERSION**: `1.0.0`
-- **APP_NAME**: `WanaShip`
-- **ISSUER**: `B&H`
-- **AUDIENCE**: `WanaShipUsers`
-- **MONGODB_URL**: `mongodb://localhost:27017/wanaship_db`
-- **MORGAN**: `dev`
-- **NODE_ENV**: `development`
-- **JWT_SECRET**: `YOUR_JWT_SECRET`
-- **JWT_EXPIRY**: `30d`
-- **JWT_ALGORITHM**: `HS256`
-- **OTP_EXPIRATION**: `10`
-- **EMAIL_HOST**: `smtp.gmail.com`
-- **EMAIL_PORT**: `587`
-- **EMAIL_SECURE**: `false`
-- **EMAIL_USER**: `YOUR_EMAIL`
-- **EMAIL_PASS**: `YOUR_EMAIL_PASSWORD`
-- **RATE_LIMIT_WINDOW_MS**: `15`
-- **RATE_LIMIT_MAX**: `10`
-- **BCRYPT_ROUNDS**: `10`
-- **ACCOUNT_RECOVERY_PERIOD**: `15`
-- **GOOGLE_CLIENT_ID**: `YOUR_GOOGLE_CLIENT_ID`
-- **GOOGLE_CLIENT_SECRET**: `YOUR_GOOGLE_CLIENT_SECRET`
-- **DISCORD_CLIENT_ID**: `YOUR_DISCORD_CLIENT_ID`
-- **DISCORD_CLIENT_SECRET**: `YOUR_DISCORD_CLIENT_SECRET`
+- PORT: `3000`
+- BASE_URL: `http://localhost:3000`
+- API_PREFIX: `/wanaship/dev`
+- APP_VERSION: `1.0.0`
+- APP_NAME: `WanaShip`
+- ISSUER: `B&H`
+- AUDIENCE: `WanaShipUsers`
+- MONGODB_URL: `mongodb://localhost:27017/wanaship_db`
+- MORGAN: `dev`
+- NODE_ENV: `development`
+- JWT_SECRET: `YOUR_JWT_SECRET`
+- JWT_EXPIRY: `30d`
+- JWT_ALGORITHM: `HS256`
+- OTP_EXPIRATION: `10`
+- EMAIL_HOST: `smtp.gmail.com`
+- EMAIL_PORT: `587`
+- EMAIL_SECURE: `false`
+- EMAIL_USER: `YOUR_EMAIL`
+- EMAIL_PASS: `YOUR_EMAIL_PASSWORD`
+- RATE_LIMIT_WINDOW_MS: `15`
+- RATE_LIMIT_MAX: `10`
+- BCRYPT_ROUNDS: `10`
+- ACCOUNT_RECOVERY_PERIOD: `15`
+- GOOGLE_CLIENT_ID: `YOUR_GOOGLE_CLIENT_ID`
+- GOOGLE_CLIENT_SECRET: `YOUR_GOOGLE_CLIENT_SECRET`
+- DISCORD_CLIENT_ID: `YOUR_DISCORD_CLIENT_ID`
+- DISCORD_CLIENT_SECRET: `YOUR_DISCORD_CLIENT_SECRET`
 
 4. **Run the application**
 npm run dev
