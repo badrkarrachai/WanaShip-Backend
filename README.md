@@ -4,11 +4,11 @@
 
 WanaShip-Backend is the server-side component of the WanaShip application, a modern shipping and parcel management system. This Node.js backend provides robust APIs for user management, parcel tracking, and shipping operations.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18.2-lightgrey.svg)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green.svg)](https://www.mongodb.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.19.2-lightgrey.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/Mongoose-8.5.2-green.svg)](https://mongoosejs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 ## 🚀 Features
 
@@ -32,18 +32,18 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 
 ## 🏗 Project Structure
 
-`
-src/
-├── config/                                                                    
-├── controllers/
-├── interfaces/
-├── middleware/
-├── models/
-├── routes/
-├── services/
-├── utils/
-└── app.ts
-`
+Our backend follows a modular and organized structure to ensure scalability and maintainability:
+- **config/**: Contains configuration files for the application, including environment variables, database connections, and third-party service setups.
+- **controllers/**: Houses the logic for handling HTTP requests. Controllers act as an intermediary between the routes and services, processing incoming requests and sending responses.
+- **interfaces/**: Defines TypeScript interfaces used throughout the application, ensuring type safety and code consistency.
+- **middleware/**: Contains Express middleware functions that process requests before they reach the route handlers. This includes authentication checks, error handling, and request parsing.
+- **models/**: Defines the data models and schemas for the application, typically representing database collections or tables.
+- **routes/**: Defines the API endpoints and maps them to the appropriate controller functions. This directory organizes the routing structure of the application.
+- **services/**: Contains the core business logic of the application. Services handle complex operations, data processing, and interactions with external APIs or databases.
+- **utils/**: Hosts utility functions and helper modules that are used across the application, such as data validation, formatting, or custom error classes.
+- **app.ts**: The main entry point of the application, where the Express app is initialized and configured.
+
+This structure promotes separation of concerns, making the codebase easier to navigate, test, and maintain as the project grows.
 
 ## 🚦 Getting Started
 
