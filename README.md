@@ -4,6 +4,12 @@
 
 WanaShip-Backend is the server-side component of the WanaShip application, a modern shipping and parcel management system. This Node.js backend provides robust APIs for user management, parcel tracking, and shipping operations.
 
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18.2-lightgrey.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green.svg)](https://www.mongodb.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## 🚀 Features
 
 - **User Authentication**: Secure login and registration system with JWT
@@ -25,17 +31,18 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 - **Cloudinary**: Cloud storage for media files
 
 ## 🏗 Project Structure
+
 src/
-├── config/
-├── controllers/
-├── interfaces/
-├── middleware/
-├── models/
-├── routes/
-├── services/
-├── utils/
-└── server.ts
-Copy
+--- config/
+--- controllers/
+--- interfaces/
+--- middleware/
+--- models/
+--- routes/
+--- services/
+--- utils/
+--- app.ts
+
 ## 🚦 Getting Started
 
 1. **Clone the repository**
@@ -57,10 +64,10 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
-Copy
+
 4. **Run the application**
 npm run dev
-Copy
+
 ## 📚 API Documentation
 
 (Include links to your API documentation or describe key endpoints here)
@@ -69,7 +76,7 @@ Copy
 
 Run the test suite with:
 npm test
-Copy
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/badrkarrachai/WanaShip-Backend/issues).
