@@ -33,25 +33,25 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 ## 🏗 Project Structure
 
 src/
---- config/
---- controllers/
---- interfaces/
---- middleware/
---- models/
---- routes/
---- services/
---- utils/
---- app.ts
+- config/
+- controllers/
+- interfaces/
+- middleware/
+- models/
+- routes/
+- services/
+- utils/
+- app.ts
 
 ## 🚦 Getting Started
 
 1. **Clone the repository**
 git clone https://github.com/badrkarrachai/WanaShip-Backend.git
-Copy
+
 2. **Install dependencies**
 cd WanaShip-Backend
 npm install
-Copy
+
 3. **Set up environment variables**
 Create a `.env` file in the root directory and add the following:
 PORT=3000
