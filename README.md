@@ -1,53 +1,99 @@
-# WanaShip
+# WanaShip-Backend
 
-![github-icon](https://github.com/user-attachments/assets/5d67a89e-a48f-410c-9b83-a23f4803fcfe)
+![github-icon](https://github.com/user-attachments/assets/9e3ef174-0b83-4d34-9c0f-33477d8a298c)
 
+WanaShip-Backend is the server-side component of the WanaShip application, a modern shipping and parcel management system. This Node.js backend provides robust APIs for user management, parcel tracking, and shipping operations.
 
-## 📦 Revolutionize Your Parcel Forwarding Experience with Wanaship
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.19.2-lightgrey.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/Mongoose-8.5.2-green.svg)](https://mongoosejs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
-Wanaship is a robust Express and TypeScript backend for a Software-as-a-Service (SaaS) application focused on parcel forwarding. Our mission is to empower users with the tools they need to take control of their deliveries and achieve their shipping goals.
+## 🚀 Features
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.5+-blue.svg)](https://www.typescriptlang.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-4.x-orange.svg)](https://expressjs.com/)
-[![Node.js](https://img.shields.io/badge/Node.js-14.x-green.svg)](https://nodejs.org/)
+- **User Authentication**: Secure login and registration system with JWT
+- **Parcel Management**: Create, update, and track parcels
+- **Address Management**: Manage shipping and receiving addresses
+- **Media Handling**: Upload and manage images for parcels and user profiles
+- **OAuth Integration**: Sign in with Google and Discord
+- **Role-Based Access Control**: Differentiate between user types (e.g., customers, admins)
 
-## 🌟 Features
-- 🔐 Secure user authentication and authorization
-- 📦 Parcel tracking and management
-- 📊 Shipping cost estimation and budgeting
-- 📈 Admin tools and tracking
-- 📱 RESTful API for seamless frontend integration
-- 📆 Recurring shipment management
-- 📊 Detailed shipping reports and insights
-- 🔔 Customizable alerts and notifications
+## 🛠 Tech Stack
 
-## 🛠️ Tech Stack
-- **Language:** TypeScript
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JSON Web Tokens (JWT)
-- **API Documentation:** Swagger / OpenAPI
-- **Testing:** Jest
-- **Linting:** ESLint
-- **Formatting:** Prettier
+- **Node.js**: Runtime environment
+- **Express.js**: Web application framework
+- **MongoDB**: Database
+- **Mongoose**: ODM for MongoDB
+- **TypeScript**: Programming language
+- **JWT**: Authentication
+- **Multer**: File upload handling
+- **Cloudinary**: Cloud storage for media files
 
-## 🚀 Getting Started
+## 🏗 Project Structure
 
-### Prerequisites
-- Node.js (v14 or later)
-- MongoDB
+Our backend follows a modular and organized structure to ensure scalability and maintainability:
+- **config/**: Contains configuration files for the application, including environment variables, database connections, and third-party service setups.
+- **controllers/**: Houses the logic for handling HTTP requests. Controllers act as an intermediary between the routes and services, processing incoming requests and sending responses.
+- **interfaces/**: Defines TypeScript interfaces used throughout the application, ensuring type safety and code consistency.
+- **middleware/**: Contains Express middleware functions that process requests before they reach the route handlers. This includes authentication checks, error handling, and request parsing.
+- **models/**: Defines the data models and schemas for the application, typically representing database collections or tables.
+- **routes/**: Defines the API endpoints and maps them to the appropriate controller functions. This directory organizes the routing structure of the application.
+- **services/**: Contains the core business logic of the application. Services handle complex operations, data processing, and interactions with external APIs or databases.
+- **utils/**: Hosts utility functions and helper modules that are used across the application, such as data validation, formatting, or custom error classes.
+- **app.ts**: The main entry point of the application, where the Express app is initialized and configured.
 
-### Installation
-1. Clone the repository:
-- git clone https://github.com/your-username/wanaship.git
-2. Install dependencies:
-- cd wanaship
-- npm install
-3. Set up environment variables:
-- Create a `.env` file in the root directory
-- Add the necessary environment variables (e.g., MongoDB connection string, JWT secret, etc.)
-4. Start the development server:
-- npm run start:dev
-5. The API will be available at `http://localhost:3000`.
+This structure promotes separation of concerns, making the codebase easier to navigate, test, and maintain as the project grows.
+
+## 🚦 Getting Started
+
+1. **Clone the repository**
+git clone https://github.com/badrkarrachai/WanaShip-Backend.git
+
+2. **Install dependencies**
+cd WanaShip-Backend
+npm install
+
+3. **Set up environment variables**
+Create a `.env` file in the root directory and add the following:
+PORT=3000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DISCORD_CLIENT_ID=your_discord_client_id
+DISCORD_CLIENT_SECRET=your_discord_client_secret
+
+4. **Run the application**
+npm run dev
+
+## 📚 API Documentation
+
+(Include links to your API documentation or describe key endpoints here)
+
+## 🧪 Testing
+
+Run the test suite with:
+npm test
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/badrkarrachai/WanaShip-Backend/issues).
+
+## 📝 License
+
+This project is [MIT](LICENSE) licensed.
+
+## 👨‍💻 Author
+
+**Badr Karrachai**
+
+- GitHub: [@badrkarrachai](https://github.com/badrkarrachai)
+- LinkedIn: [Badr Karrachai](https://www.linkedin.com/in/badrkarrachai/)
+
+---
+
+Made with ❤️ for WanaShip
