@@ -1,21 +1,21 @@
 import { Request, Response } from "express";
 import User from "../../models/users_model";
-import { generateToken } from "../../utils/jwt";
+import { generateToken } from "../../utils/jwt_util";
 import config from "../../config";
 import bcrypt from "bcrypt";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import { check, validationResult } from "express-validator";
-import { sendOTP, verifyOTPLocally } from "../../utils/otp";
+import { sendOTP, verifyOTPLocally } from "../../utils/otp_util";
 import {
   requestPasswordResetValidationRules,
   resetPasswordValidationRules,
   validateRequest,
-} from "../../utils/validations";
-import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
-import { formatUserData } from "../../utils/user_utils";
+} from "../../utils/validations_util";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
 // Request password reset
 export const requestPasswordReset = async (req: Request, res: Response) => {

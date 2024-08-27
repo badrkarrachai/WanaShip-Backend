@@ -2,21 +2,21 @@ import { Request, Response } from "express";
 import User from "../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { sendEmail } from "../../utils/email";
-import { readHtmlTemplate } from "../../utils/read_html";
-import { generateToken } from "../../utils/jwt";
+import { sendEmail } from "../../utils/email_sender_util";
+import { readHtmlTemplate } from "../../utils/read_html_util";
+import { generateToken } from "../../utils/jwt_util";
 import config from "../../config";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import { body, validationResult } from "express-validator";
 import {
   registrationValidationRules,
   validateRequest,
-} from "../../utils/validations";
+} from "../../utils/validations_util";
 import { IUser } from "../../interfaces/user_interface";
-import { formatUserData } from "../../utils/user_utils";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
 // Registration with email verification false
 export const register = async (req: Request, res: Response) => {

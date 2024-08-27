@@ -4,13 +4,13 @@ import validator from "validator";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
-import { sendOTP, verifyOTPLocally } from "../../../utils/otp";
+} from "../../../utils/response_handler_util";
+import { sendOTP, verifyOTPLocally } from "../../../utils/otp_util";
 import {
   requestverifyEmailValidationRules,
   validateRequest,
   verifyEmailValidationRules,
-} from "../../../utils/validations";
+} from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Request user email verification

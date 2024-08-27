@@ -3,11 +3,11 @@ import User from "../../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import config from "../../../config";
-import { sendErrorResponse } from "../../../utils/response_handler";
+import { sendErrorResponse } from "../../../utils/response_handler_util";
 import {
   updateProfilePasswordValidationRules,
   validateRequest,
-} from "../../../utils/validations";
+} from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 export const updateUserPassword = async (req: AuthRequest, res: Response) => {

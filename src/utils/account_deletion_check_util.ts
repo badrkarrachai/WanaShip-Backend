@@ -1,4 +1,4 @@
-import { sendErrorResponse } from "./response_handler";
+import { sendErrorResponse } from "./response_handler_util";
 import e, { Request, Response } from "express";
 
 export function checkAccountRecoveryStatus(
@@ -22,7 +22,7 @@ export function checkAccountRecoveryStatus(
 
     if (daysLeftInRecoveryPeriod > 0) {
       // Return the message string if within the recovery period
-      return `Your account is in the recovery period. You have ${daysLeftInRecoveryPeriod} day${
+      return `Your account is in the deletion process, You have ${daysLeftInRecoveryPeriod} day${
         daysLeftInRecoveryPeriod !== 1 ? "s" : ""
       } left to reactivate it.`;
     } else {

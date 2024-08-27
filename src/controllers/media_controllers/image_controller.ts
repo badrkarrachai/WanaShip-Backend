@@ -4,7 +4,7 @@ import Image from "../../models/image_model";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import config from "../../config";
 import sharp from "sharp";
 import fs from "fs/promises";
@@ -153,7 +153,15 @@ export const uploadImage = async (
       return sendSuccessResponse({
         res,
         message: "Profile image uploaded successfully",
-        data: processedImage,
+        data: {
+          id: processedImage.id,
+          name: processedImage.name,
+          url: processedImage.url,
+          isDeleted: processedImage.isDeleted,
+          deletedAt: processedImage.deletedAt,
+          createdAt: processedImage.createdAt,
+          updatedAt: processedImage.updatedAt,
+        },
         status: 201,
       });
     } else if (uploadType === "multiple") {
@@ -179,7 +187,17 @@ export const uploadImage = async (
       return sendSuccessResponse({
         res,
         message: "Parcel images uploaded successfully",
-        data: successfulUploads.map((img) => img),
+        data: successfulUploads.map((img) => {
+          return {
+            id: img.id,
+            name: img.name,
+            url: img.url,
+            isDeleted: img.isDeleted,
+            deletedAt: img.deletedAt,
+            createdAt: img.createdAt,
+            updatedAt: img.updatedAt,
+          };
+        }),
         status: 201,
       });
     }

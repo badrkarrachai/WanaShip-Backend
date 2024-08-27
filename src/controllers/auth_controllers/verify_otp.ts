@@ -4,12 +4,12 @@ import User from "../../models/users_model";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
-import { verifyOTPLocally } from "../../utils/otp";
+} from "../../utils/response_handler_util";
+import { verifyOTPLocally } from "../../utils/otp_util";
 import {
   validateRequest,
   verifyOtpValidationRules,
-} from "../../utils/validations";
+} from "../../utils/validations_util";
 
 // Step 2: Verify OTP
 export const verifyOTP = async (req: Request, res: Response) => {

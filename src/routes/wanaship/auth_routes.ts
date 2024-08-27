@@ -6,7 +6,7 @@ import {
   requestPasswordReset,
   resetPassword,
 } from "../../controllers/auth_controllers/reset_password_controller";
-import { rateLimiterGeneral } from "../../utils/rate_limiter";
+import { rateLimiterGeneral } from "../../utils/rate_limiter_util";
 import { verifyOTP } from "../../controllers/auth_controllers/verify_otp";
 import {
   googleAuth,

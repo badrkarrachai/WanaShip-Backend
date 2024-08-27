@@ -1,16 +1,19 @@
 import { Request, Response } from "express";
 import User from "../../models/users_model";
-import { generateToken } from "../../utils/jwt";
+import { generateToken } from "../../utils/jwt_util";
 import sanitize from "mongo-sanitize";
 import bcrypt from "bcrypt";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
-import { loginValidationRules, validateRequest } from "../../utils/validations";
+} from "../../utils/response_handler_util";
+import {
+  loginValidationRules,
+  validateRequest,
+} from "../../utils/validations_util";
 import config from "../../config";
-import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
-import { formatUserData } from "../../utils/user_utils";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;

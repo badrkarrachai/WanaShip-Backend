@@ -3,15 +3,15 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../../models/users_model";
 import Image from "../../models/image_model";
-import { generateToken } from "../../utils/jwt";
+import { generateToken } from "../../utils/jwt_util";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
-import { formatUserData } from "../../utils/user_utils";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
+import { formatUserData } from "../../utils/user_auth_response_util";
 
 // Configure Passport Google Strategy
 passport.use(

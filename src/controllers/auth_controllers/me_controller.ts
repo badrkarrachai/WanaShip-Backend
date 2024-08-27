@@ -3,10 +3,10 @@ import User from "../../models/users_model";
 import {
   sendErrorResponse,
   sendSuccessResponse,
-} from "../../utils/response_handler";
+} from "../../utils/response_handler_util";
 import { Request, Response } from "express";
-import { formatUserData } from "../../utils/user_utils";
-import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check";
+import { formatUserData } from "../../utils/user_auth_response_util";
+import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
 import config from "../../config";
 
 export const me = async (req: AuthRequest, res: Response) => {
@@ -60,7 +60,7 @@ export const me = async (req: AuthRequest, res: Response) => {
       data: userData,
     });
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Me error:", err);
     return sendErrorResponse({
       res: res,
       message: "Server error",

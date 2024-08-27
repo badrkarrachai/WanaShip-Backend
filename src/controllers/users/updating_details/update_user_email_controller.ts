@@ -5,13 +5,13 @@ import bcrypt from "bcrypt";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
-import { sendOTP, verifyOTPLocally } from "../../../utils/otp";
+} from "../../../utils/response_handler_util";
+import { sendOTP, verifyOTPLocally } from "../../../utils/otp_util";
 import {
   updateProfileEmailValidationRules,
   updateProfileEmailViaOTPValidationRules,
   validateRequest,
-} from "../../../utils/validations";
+} from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 export const requestUpdateUserEmail = async (

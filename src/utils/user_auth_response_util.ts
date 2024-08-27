@@ -16,7 +16,17 @@ export function formatUserData(
     name: user.name,
     email: user.email,
     role: user.role,
-    avatar: user.avatar,
+    avatar: user.avatar
+      ? {
+          id: user.avatar.id,
+          name: user.avatar.name,
+          url: user.avatar.url,
+          isDeleted: user.avatar.isDeleted,
+          deletedAt: user.avatar.deletedAt,
+          createdAt: user.avatar.createdAt,
+          updatedAt: user.avatar.updatedAt,
+        }
+      : null,
     addresses: user.addresses,
     isActivated: user.isActivated,
     preferences: user.preferences,

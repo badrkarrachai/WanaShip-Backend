@@ -4,11 +4,11 @@ import { JwtPayload } from "../../../interfaces/jwt_payload_interface";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
+} from "../../../utils/response_handler_util";
 import {
   requesteleteAccountValidationRules,
   validateRequest,
-} from "../../../utils/validations";
+} from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Delete user

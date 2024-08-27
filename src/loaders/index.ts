@@ -1,7 +1,7 @@
-import connectDB from "./db";
-import expressLoader from "./express";
+import connectDB from "./db_loader";
+import expressLoader from "./express_loader";
 import type { Express } from "express";
-import passportLoader from "./passport";
+import passportLoader from "./passport_loader";
 
 export default async function ({ app }: { app: Express }) {
   await connectDB();

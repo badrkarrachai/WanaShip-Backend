@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { sendEmail } from "./email";
-import { readHtmlTemplate } from "../utils/read_html";
+import { sendEmail } from "./email_sender_util";
+import { readHtmlTemplate } from "./read_html_util";
 import config from "../config";
 import bcrypt from "bcrypt";
 import { IUser } from "../interfaces/user_interface";

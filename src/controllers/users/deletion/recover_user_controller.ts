@@ -4,7 +4,7 @@ import { JwtPayload } from "../../../interfaces/jwt_payload_interface";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
+} from "../../../utils/response_handler_util";
 
 interface AuthRequest extends Request {
   user?: JwtPayload["user"];

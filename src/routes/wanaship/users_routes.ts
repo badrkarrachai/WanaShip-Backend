@@ -17,7 +17,6 @@ import {
   removeUserProfilePicture,
   updateUserProfilePicture,
 } from "../../controllers/users/updating_details/update_user_avatar_controller";
-import { me } from "../../controllers/auth_controllers/me_controller";
 
 const router = Router();
 

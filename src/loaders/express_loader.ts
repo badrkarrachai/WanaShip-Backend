@@ -41,9 +41,6 @@ export default async function ({ app }: { app: Express }) {
 
   // Routes
   app.use(config.app.apiPrefix, indexRouter);
-  app.use("/auth", authRouter);
-  app.use("/users", userRouter);
-  app.use("/images", imageRouter);
 
   // Error handlers
   app.use(notFoundHandler);

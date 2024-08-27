@@ -4,11 +4,11 @@ import validator from "validator";
 import {
   sendErrorResponse,
   sendSuccessResponse,
-} from "../../../utils/response_handler";
+} from "../../../utils/response_handler_util";
 import {
   updateProfileNameValidationRules,
   validateRequest,
-} from "../../../utils/validations";
+} from "../../../utils/validations_util";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 export const updateUserName = async (req: AuthRequest, res: Response) => {

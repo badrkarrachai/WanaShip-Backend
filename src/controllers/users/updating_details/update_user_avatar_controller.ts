@@ -5,7 +5,7 @@ import Image from "../../../models/image_model";
 import {
   sendSuccessResponse,
   sendErrorResponse,
-} from "../../../utils/response_handler";
+} from "../../../utils/response_handler_util";
 import { Types } from "mongoose";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
