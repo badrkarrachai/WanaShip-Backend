@@ -32,16 +32,18 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 
 ## 🏗 Project Structure
 
+`
 src/
-- config/
-- controllers/
-- interfaces/
-- middleware/
-- models/
-- routes/
-- services/
-- utils/
-- app.ts
+├── config/
+├── controllers/
+├── interfaces/
+├── middleware/
+├── models/
+├── routes/
+├── services/
+├── utils/
+└── app.ts
+`
 
 ## 🚦 Getting Started
 
