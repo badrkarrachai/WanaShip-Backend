@@ -56,7 +56,6 @@ npm install
 
 3. **Set up environment variables**
 Create a `.env` file in the root directory and add the following:
-### Server Configuration
 - **PORT**: `3000`
 - **BASE_URL**: `http://localhost:3000`
 - **API_PREFIX**: `/wanaship/dev`
@@ -64,44 +63,24 @@ Create a `.env` file in the root directory and add the following:
 - **APP_NAME**: `WanaShip`
 - **ISSUER**: `B&H`
 - **AUDIENCE**: `WanaShipUsers`
-
-### MongoDB
 - **MONGODB_URL**: `mongodb://localhost:27017/wanaship_db`
-
-### Express Configuration
 - **MORGAN**: `dev`
 - **NODE_ENV**: `development`
-
-### JWT Configuration
 - **JWT_SECRET**: `YOUR_JWT_SECRET`
 - **JWT_EXPIRY**: `30d`
 - **JWT_ALGORITHM**: `HS256`
-
-### OTP Configuration
 - **OTP_EXPIRATION**: `10`
-
-### Email Configuration
 - **EMAIL_HOST**: `smtp.gmail.com`
 - **EMAIL_PORT**: `587`
 - **EMAIL_SECURE**: `false`
 - **EMAIL_USER**: `YOUR_EMAIL`
 - **EMAIL_PASS**: `YOUR_EMAIL_PASSWORD`
-
-### Rate Limiter
 - **RATE_LIMIT_WINDOW_MS**: `15`
 - **RATE_LIMIT_MAX**: `10`
-
-### Bcrypt
 - **BCRYPT_ROUNDS**: `10`
-
-### Account Recovery
 - **ACCOUNT_RECOVERY_PERIOD**: `15`
-
-### Google API
 - **GOOGLE_CLIENT_ID**: `YOUR_GOOGLE_CLIENT_ID`
 - **GOOGLE_CLIENT_SECRET**: `YOUR_GOOGLE_CLIENT_SECRET`
-
-### Discord API
 - **DISCORD_CLIENT_ID**: `YOUR_DISCORD_CLIENT_ID`
 - **DISCORD_CLIENT_SECRET**: `YOUR_DISCORD_CLIENT_SECRET`
 
