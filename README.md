@@ -1,53 +1,90 @@
-# WanaShip
+# WanaShip-Backend
 
-![github-icon](https://github.com/user-attachments/assets/5d67a89e-a48f-410c-9b83-a23f4803fcfe)
+![github-icon](https://github.com/user-attachments/assets/9e3ef174-0b83-4d34-9c0f-33477d8a298c)
 
+WanaShip-Backend is the server-side component of the WanaShip application, a modern shipping and parcel management system. This Node.js backend provides robust APIs for user management, parcel tracking, and shipping operations.
 
-## 📦 Revolutionize Your Parcel Forwarding Experience with Wanaship
+## 🚀 Features
 
-Wanaship is a robust Express and TypeScript backend for a Software-as-a-Service (SaaS) application focused on parcel forwarding. Our mission is to empower users with the tools they need to take control of their deliveries and achieve their shipping goals.
+- **User Authentication**: Secure login and registration system with JWT
+- **Parcel Management**: Create, update, and track parcels
+- **Address Management**: Manage shipping and receiving addresses
+- **Media Handling**: Upload and manage images for parcels and user profiles
+- **OAuth Integration**: Sign in with Google and Discord
+- **Role-Based Access Control**: Differentiate between user types (e.g., customers, admins)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.5+-blue.svg)](https://www.typescriptlang.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-4.x-orange.svg)](https://expressjs.com/)
-[![Node.js](https://img.shields.io/badge/Node.js-14.x-green.svg)](https://nodejs.org/)
+## 🛠 Tech Stack
 
-## 🌟 Features
-- 🔐 Secure user authentication and authorization
-- 📦 Parcel tracking and management
-- 📊 Shipping cost estimation and budgeting
-- 📈 Admin tools and tracking
-- 📱 RESTful API for seamless frontend integration
-- 📆 Recurring shipment management
-- 📊 Detailed shipping reports and insights
-- 🔔 Customizable alerts and notifications
+- **Node.js**: Runtime environment
+- **Express.js**: Web application framework
+- **MongoDB**: Database
+- **Mongoose**: ODM for MongoDB
+- **TypeScript**: Programming language
+- **JWT**: Authentication
+- **Multer**: File upload handling
+- **Cloudinary**: Cloud storage for media files
 
-## 🛠️ Tech Stack
-- **Language:** TypeScript
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JSON Web Tokens (JWT)
-- **API Documentation:** Swagger / OpenAPI
-- **Testing:** Jest
-- **Linting:** ESLint
-- **Formatting:** Prettier
+## 🏗 Project Structure
+src/
+├── config/
+├── controllers/
+├── interfaces/
+├── middleware/
+├── models/
+├── routes/
+├── services/
+├── utils/
+└── server.ts
+Copy
+## 🚦 Getting Started
 
-## 🚀 Getting Started
+1. **Clone the repository**
+git clone https://github.com/badrkarrachai/WanaShip-Backend.git
+Copy
+2. **Install dependencies**
+cd WanaShip-Backend
+npm install
+Copy
+3. **Set up environment variables**
+Create a `.env` file in the root directory and add the following:
+PORT=3000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DISCORD_CLIENT_ID=your_discord_client_id
+DISCORD_CLIENT_SECRET=your_discord_client_secret
+Copy
+4. **Run the application**
+npm run dev
+Copy
+## 📚 API Documentation
 
-### Prerequisites
-- Node.js (v14 or later)
-- MongoDB
+(Include links to your API documentation or describe key endpoints here)
 
-### Installation
-1. Clone the repository:
-- git clone https://github.com/your-username/wanaship.git
-2. Install dependencies:
-- cd wanaship
-- npm install
-3. Set up environment variables:
-- Create a `.env` file in the root directory
-- Add the necessary environment variables (e.g., MongoDB connection string, JWT secret, etc.)
-4. Start the development server:
-- npm run start:dev
-5. The API will be available at `http://localhost:3000`.
+## 🧪 Testing
+
+Run the test suite with:
+npm test
+Copy
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/badrkarrachai/WanaShip-Backend/issues).
+
+## 📝 License
+
+This project is [MIT](LICENSE) licensed.
+
+## 👨‍💻 Author
+
+**Badr Karrachai**
+
+- GitHub: [@badrkarrachai](https://github.com/badrkarrachai)
+- LinkedIn: [Badr Karrachai](https://www.linkedin.com/in/badrkarrachai/)
+
+---
+
+Made with ❤️ for WanaShip
