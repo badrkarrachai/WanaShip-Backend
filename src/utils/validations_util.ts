@@ -69,6 +69,8 @@ const validationRules = {
   parcelName: body("parcelName")
     .exists()
     .withMessage("Parcel name is required")
+    .isString()
+    .withMessage("Parcel name must be a string")
     .isLength({ min: 3, max: 50 })
     .withMessage("Parcel name must be 3-50 characters long"),
   parcelDescription: body("parcelDescription")
@@ -81,6 +83,18 @@ const validationRules = {
     .withMessage("Parcel quantity is required")
     .isInt()
     .withMessage("Parcel quantity must be a number"),
+  trackingNumber: body("trackingNumber")
+    .exists()
+    .withMessage("Tracking number is required")
+    .isString()
+    .withMessage("Tracking number must be a string")
+    .isLength({ min: 1, max: 50 })
+    .withMessage("Tracking number must be 1-50 characters long"),
+  weight: body("weight")
+    .exists()
+    .withMessage("Weight is required")
+    .isFloat({ min: 0 })
+    .withMessage("Weight must be a non-negative number"),
   parcelPrice: body("parcelPrice")
     .exists()
     .withMessage("Parcel price is required")
@@ -150,6 +164,20 @@ const validationRules = {
     .withMessage("Phone number must be a string")
     .isLength({ min: 2, max: 50 })
     .withMessage("Phone number must be 2-50 characters long"),
+  parcelId: body("parcelId")
+    .exists()
+    .withMessage("Parcel ID is required")
+    .isString()
+    .withMessage("Parcel ID must be a string")
+    .isLength({ min: 1, max: 250 })
+    .withMessage("Parcel ID must be 1-250 characters long"),
+  referenceId: body("referenceId")
+    .exists()
+    .withMessage("Reference ID is required")
+    .isString()
+    .withMessage("Reference ID must be a string")
+    .isLength({ min: 1, max: 250 })
+    .withMessage("Reference ID must be 1-250 characters long"),
 };
 
 // Validation rule sets for specific routes
@@ -216,9 +244,15 @@ export const addParcelValidationRules = [
   validationRules.parcelName,
   validationRules.parcelDescription,
   validationRules.parcelQuantity,
+  validationRules.trackingNumber,
+  validationRules.weight,
   validationRules.toAddress,
   validationRules.parcelPrice,
   validationRules.parcelPurchaseDate,
+];
+export const deleteParcelValidationRules = [
+  validationRules.parcelId,
+  validationRules.referenceId,
 ];
 // Address validation rules
 export const addAddressValidationRules = [

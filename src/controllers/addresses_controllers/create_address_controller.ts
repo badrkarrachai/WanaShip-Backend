@@ -10,6 +10,7 @@ import {
 } from "../../utils/response_handler_util";
 import sanitize from "mongo-sanitize";
 import Address from "../../models/address_model";
+import { formatAddressData } from "../../utils/responces_templates/address_response_template";
 
 export const createAddress = async (req: AuthRequest, res: Response) => {
   try {
@@ -79,22 +80,13 @@ export const createAddress = async (req: AuthRequest, res: Response) => {
 
     await address.save();
 
+    const addressData = formatAddressData(address);
     // Send response
     return sendSuccessResponse({
       res,
       message: "Address created successfully",
       data: {
-        address: {
-          id: address._id,
-          country: address.country,
-          addressLine1: address.addressLine1,
-          addressLine2: address.addressLine2,
-          city: address.city,
-          state: address.state,
-          zip: address.zip,
-          countryCode: address.countryCode,
-          phone: address.phoneNumber,
-        },
+        addressData,
       },
       status: 201,
     });

@@ -21,9 +21,19 @@ const parcelSchema = new Schema<IParcel>(
     reshipperRecivedQuantity: { type: Number, default: null },
     status: {
       type: String,
-      enum: ["pending", "recived", "approved", "rejected", "cancelled", "sent"],
+      enum: [
+        "pending",
+        "processing",
+        "recived",
+        "approved",
+        "rejected",
+        "cancelled",
+        "sent",
+      ],
       default: "pending",
     },
+    trackingNumber: { type: String, required: true },
+    weight: { type: Number, required: true },
     referenceId: { type: String, required: true },
   },
   { timestamps: true }

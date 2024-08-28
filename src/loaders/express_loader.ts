@@ -4,15 +4,12 @@ import cors from "cors";
 import morgan from "morgan";
 import config from "../config";
 import indexRouter from "../routes";
-import authRouter from "../routes/wanaship/auth_routes";
-import userRouter from "../routes/wanaship/users_routes";
 import {
   notFoundHandler,
   globalErrorHandler,
 } from "../routes/middlewares/errors_middleware";
 import type { Express } from "express";
 import path from "path";
-import imageRouter from "../routes/wanaship/image_routes";
 
 export default async function ({ app }: { app: Express }) {
   // Status checkpoints

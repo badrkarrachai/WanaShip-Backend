@@ -16,7 +16,7 @@ import {
   validateRequest,
 } from "../../utils/validations_util";
 import { IUser } from "../../interfaces/user_interface";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 
 // Registration with email verification false
 export const register = async (req: Request, res: Response) => {

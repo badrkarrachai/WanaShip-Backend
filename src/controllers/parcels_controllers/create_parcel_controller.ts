@@ -13,6 +13,7 @@ import Parcel from "../../models/parcel_model";
 import { generateReferenceId } from "../../utils/reference_id_generator_util";
 import mongoose from "mongoose";
 import Address from "../../models/address_model";
+import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 
 export const createParcel = async (req: AuthRequest, res: Response) => {
   try {
@@ -41,6 +42,8 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       parcelPrice,
       parcelPurchaseDate,
       toAddress,
+      trackingNumber,
+      weight,
     } = req.body;
 
     // Sanitize input
@@ -51,6 +54,8 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       parcelPrice: sanitize(parcelPrice),
       parcelPurchaseDate: sanitize(parcelPurchaseDate),
       toAddress: sanitize(toAddress),
+      trackingNumber: sanitize(trackingNumber),
+      weight: sanitize(weight),
     };
 
     // Additional input validation
@@ -124,6 +129,24 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Check if the parcel is already created by the user
+    const parcelExists = await Parcel.findOne({
+      userId: userId,
+      toAddress: sanitizedData.toAddress,
+      isDeleted: false,
+      trackingNumber: sanitizedData.trackingNumber,
+    });
+    if (parcelExists) {
+      return sendErrorResponse({
+        res,
+        message: "Parcel already created",
+        errorCode: "ALREADY_EXISTS",
+        errorDetails:
+          "A parcel with the same address and tracking number already exists, try updating the quantity of the existing parcel instead.",
+        status: 400,
+      });
+    }
+
     // Generate a unique reference ID
     const referenceId = generateReferenceId();
 
@@ -137,6 +160,8 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       purchaseDate: new Date(sanitizedData.parcelPurchaseDate),
       toAddress: sanitizedData.toAddress, // Ensure this is included
       referenceId: referenceId,
+      weight: sanitizedData.weight,
+      trackingNumber: sanitizedData.trackingNumber,
       status: "pending",
       isActive: true,
       isDeleted: false,
@@ -144,19 +169,13 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
 
     await parcel.save();
 
+    const parcelData = await formatParcelData(parcel);
+
     // Send response
     return sendSuccessResponse({
       res,
       message: "Parcel created successfully",
-      data: {
-        id: parcel._id,
-        name: parcel.name,
-        description: parcel.description,
-        price: parcel.price,
-        purchaseDate: parcel.purchaseDate,
-        referenceId: parcel.referenceId,
-        status: parcel.status,
-      },
+      data: parcelData,
       status: 201,
     });
   } catch (err) {
