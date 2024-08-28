@@ -13,7 +13,7 @@ import {
 } from "../../utils/validations_util";
 import config from "../../config";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;

@@ -5,7 +5,7 @@ import {
   sendSuccessResponse,
 } from "../../utils/response_handler_util";
 import { Request, Response } from "express";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
 import config from "../../config";
 

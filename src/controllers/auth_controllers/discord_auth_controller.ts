@@ -11,7 +11,7 @@ import {
 import config from "../../config";
 import bcrypt from "bcrypt";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 
 passport.use(
   new DiscordStrategy(

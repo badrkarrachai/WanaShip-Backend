@@ -1,4 +1,5 @@
-import { IUser } from "../interfaces/user_interface";
+import { IUser } from "../../interfaces/user_interface";
+import { formatImageData } from "./image_response_template";
 
 /**
  * Utility function to format user data for responses.
@@ -11,22 +12,13 @@ export function formatUserData(
   user: IUser,
   messagesForUser: string[] = []
 ): Record<string, any> {
+  const userAvatar = user.avatar ? formatImageData(user.avatar) : null;
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
-    avatar: user.avatar
-      ? {
-          id: user.avatar.id,
-          name: user.avatar.name,
-          url: user.avatar.url,
-          isDeleted: user.avatar.isDeleted,
-          deletedAt: user.avatar.deletedAt,
-          createdAt: user.avatar.createdAt,
-          updatedAt: user.avatar.updatedAt,
-        }
-      : null,
+    avatar: userAvatar,
     addresses: user.addresses,
     isActivated: user.isActivated,
     preferences: user.preferences,
