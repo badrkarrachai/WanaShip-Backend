@@ -13,7 +13,7 @@ export const me = async (req: AuthRequest, res: Response) => {
   const userId = req.user.id;
   try {
     // Look up user by id
-    const user = await User.findOne({ _id: userId }).populate("avatar");
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       return sendErrorResponse({
         res: res,
@@ -51,7 +51,7 @@ export const me = async (req: AuthRequest, res: Response) => {
     }
 
     // Prepare user data for response
-    const userData = formatUserData(user);
+    const userData = await formatUserData(user);
 
     // Send response
     return sendSuccessResponse({

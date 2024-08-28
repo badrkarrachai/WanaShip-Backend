@@ -12,6 +12,7 @@ import config from "../../config";
 import bcrypt from "bcrypt";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
 import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
+import { sendWelcomeEmail } from "../../utils/email_sender_util";
 
 // Configure Passport Google Strategy
 passport.use(
@@ -28,7 +29,7 @@ passport.use(
           return done(new Error("No email found in Google profile"));
         }
 
-        let user = await User.findOne({ email }).populate("avatar");
+        let user = await User.findOne({ email });
 
         if (user) {
           // Update existing user
@@ -41,9 +42,11 @@ passport.use(
           // Update avatar if not set
           if (!user.avatar && profile.photos?.[0]?.value) {
             const newAvatar = new Image({
+              userId: user.id,
               name: `${user.name}'s avatar`,
               url: profile.photos[0].value,
             });
+
             const savedAvatar = await newAvatar.save();
             user.avatar = savedAvatar.id;
           }
@@ -55,15 +58,6 @@ passport.use(
           await user.save();
         } else {
           // Create new user
-          let newAvatar;
-          if (profile.photos?.[0]?.value) {
-            newAvatar = new Image({
-              name: `${profile.displayName}'s avatar`,
-              url: profile.photos[0].value,
-            });
-            newAvatar = await newAvatar.save();
-          }
-
           const randomPassword = await generateRandomPassword();
           const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
@@ -72,14 +66,29 @@ passport.use(
             email: email,
             googleId: profile.id,
             emailVerified: true,
-            avatar: newAvatar ? newAvatar._id : undefined,
             password: hashedPassword,
             authProvider: "google",
             accessToken: accessToken,
             refreshToken: refreshToken,
             tokenExpiresAt: new Date(Date.now() + 3600000), // 1 hour from now
           });
+
           await user.save();
+
+          // Create and save the new avatar
+          if (profile.photos?.[0]?.value) {
+            const newAvatar = new Image({
+              userId: user.id,
+              name: `${profile.displayName}'s avatar`,
+              url: profile.photos[0].value,
+            });
+            const savedAvatar = await newAvatar.save();
+            user.avatar = savedAvatar.id;
+            await user.save();
+          }
+
+          // Send welcome email to the user
+          sendWelcomeEmail(user);
         }
 
         return done(null, user);
@@ -159,7 +168,7 @@ export const googleAuthCallback = (req: Request, res: Response) => {
       // Generate JWT token
       const token = generateToken(user.id, user.role);
 
-      const userData = formatUserData(user, messagesForUser);
+      const userData = await formatUserData(user, messagesForUser);
 
       // Update last login
       user.lastLogin = new Date();

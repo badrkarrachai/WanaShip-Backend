@@ -41,15 +41,14 @@ export const login = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Find the user by sanitized email
-    const user = await User.findOne({ email: sanitizedEmail }).populate(
-      "avatar"
-    );
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return sendErrorResponse({
         res: res,
         message: "Invalid credentials",
         errorCode: "INVALID_CREDENTIALS",
-        errorDetails: "There is no account associated with this email.",
+        errorDetails:
+          "There is no account associated with this email, try creating an account.",
       });
     }
 
@@ -113,7 +112,7 @@ export const login = async (req: Request, res: Response) => {
     const token = generateToken(user.id, user.role);
 
     // Prepare user data for response
-    const userData = formatUserData(user, messagesForUser);
+    const userData = await formatUserData(user, messagesForUser);
 
     // Send response
     return sendSuccessResponse({

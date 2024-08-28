@@ -95,7 +95,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Get the user with the email
-    const user = await User.findOne({ email }).populate("avatar");
+    const user = await User.findOne({ email });
     if (!user) {
       return sendErrorResponse({
         res: res,
@@ -178,7 +178,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     const token = generateToken(user.id, user.role);
 
     // Prepare user data for response
-    const userData = formatUserData(user, messagesForUser);
+    const userData = await formatUserData(user, messagesForUser);
 
     return sendSuccessResponse({
       res: res,

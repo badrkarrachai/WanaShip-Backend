@@ -8,6 +8,7 @@ import {
 } from "../../../utils/response_handler_util";
 import { Types } from "mongoose";
 import { AuthRequest } from "../../../interfaces/auth_request_interface";
+import { formatImageData } from "../../../utils/responces_templates/image_response_template";
 
 // Controller to update user profile picture
 export const updateUserProfilePicture = async (
@@ -61,7 +62,7 @@ export const updateUserProfilePicture = async (
     return sendSuccessResponse({
       res,
       message: "Profile picture updated successfully",
-      data: { avatar: image.url },
+      data: formatImageData(image),
       status: 200,
     });
   } catch (error) {

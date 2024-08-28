@@ -18,6 +18,7 @@ import {
 } from "../../controllers/auth_controllers/discord_auth_controller";
 import { me } from "../../controllers/auth_controllers/me_controller";
 import auth from "../middlewares/auth_middleware";
+import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
 
 const router = Router();
 
@@ -34,6 +35,6 @@ router.get("/google", rateLimiterGeneral, googleAuth);
 router.get("/google/callback", rateLimiterGeneral, googleAuthCallback);
 router.get("/discord", rateLimiterGeneral, discordAuth);
 router.get("/discord/callback", rateLimiterGeneral, discordAuthCallback);
-router.get("/me", auth, me);
+router.get("/me", auth, checkAccountActivated, me);
 
 export default router;

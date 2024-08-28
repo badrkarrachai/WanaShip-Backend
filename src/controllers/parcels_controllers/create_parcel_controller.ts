@@ -9,7 +9,7 @@ import {
   validateRequest,
 } from "../../utils/validations_util";
 import sanitize from "mongo-sanitize";
-import Parcel from "../../models/parcel_model";
+import Parcel, { STATUS } from "../../models/parcel_model";
 import { generateReferenceId } from "../../utils/reference_id_generator_util";
 import mongoose from "mongoose";
 import Address from "../../models/address_model";
@@ -124,7 +124,7 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
         message: "Address not found",
         errorCode: "NOT_FOUND",
         errorDetails:
-          "The provided address does not exist. Please add a new address to your account first.",
+          "The provided address does not exist in your addresses list, Please add a new address to your account first.",
         status: 404,
       });
     }
@@ -162,7 +162,7 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       referenceId: referenceId,
       weight: sanitizedData.weight,
       trackingNumber: sanitizedData.trackingNumber,
-      status: "pending",
+      status: STATUS.PENDING,
       isActive: true,
       isDeleted: false,
     });

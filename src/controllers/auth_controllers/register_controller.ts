@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { sendEmail } from "../../utils/email_sender_util";
+import { sendEmail, sendWelcomeEmail } from "../../utils/email_sender_util";
 import { readHtmlTemplate } from "../../utils/read_html_util";
 import { generateToken } from "../../utils/jwt_util";
 import config from "../../config";
@@ -46,9 +46,7 @@ export const register = async (req: Request, res: Response) => {
     const sanitizedName = validator.escape(name);
 
     // Check if the user already exists
-    const existingUser = await User.findOne({ email: sanitizedEmail }).populate(
-      "avatar"
-    );
+    const existingUser = await User.findOne({ email: sanitizedEmail });
     if (existingUser) {
       return sendErrorResponse({
         res,
@@ -76,10 +74,10 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Send welcome email to the user
-    await sendWelcomeEmail(newUser);
+    sendWelcomeEmail(newUser);
 
     // Prepare user data for response
-    const userData = formatUserData(newUser, messagesForUser);
+    const userData = await formatUserData(newUser, messagesForUser);
 
     // Generate JWT token
     const token = generateToken(newUser.id, newUser.role);
@@ -102,16 +100,3 @@ export const register = async (req: Request, res: Response) => {
     });
   }
 };
-
-// Send welcome email to the user
-async function sendWelcomeEmail(user: IUser) {
-  let htmlTemplate = readHtmlTemplate("welcome_to.html");
-  htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
-
-  sendEmail({
-    to: user.email,
-    subject: `Welcome to ${config.app.appName}!`,
-    html: htmlTemplate,
-    text: "",
-  });
-}

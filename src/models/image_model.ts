@@ -13,5 +13,5 @@ const imageSchema = new Schema<IImages>(
 );
 
 const Image = model<IImages>("Image", imageSchema);
-
+export { IImages };
 export default Image;

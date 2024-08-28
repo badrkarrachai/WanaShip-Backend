@@ -6,7 +6,7 @@ import { IImages } from "../../interfaces/image_interface";
  * @param image - The image object from the database.
  * @returns The formatted image data object.
  */
-export function formatImageData(image: IImages): Record<string, any> {
+export function formatImageData(image: any): Record<string, any> {
   // Construct and return the formatted response
   return {
     id: image.id,
