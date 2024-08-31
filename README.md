@@ -33,6 +33,7 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 ## 🏗 Project Structure
 
 Our backend follows a modular and organized structure to ensure scalability and maintainability:
+
 - **config/**: Contains configuration files for the application, including environment variables, database connections, and third-party service setups.
 - **controllers/**: Houses the logic for handling HTTP requests. Controllers act as an intermediary between the routes and services, processing incoming requests and sending responses.
 - **interfaces/**: Defines TypeScript interfaces used throughout the application, ensuring type safety and code consistency.
@@ -48,14 +49,15 @@ This structure promotes separation of concerns, making the codebase easier to na
 ## 🚦 Getting Started
 
 1. **Clone the repository**
-git clone https://github.com/badrkarrachai/WanaShip-Backend.git
+   git clone https://github.com/badrkarrachai/WanaShip-Backend.git
 
 2. **Install dependencies**
-cd WanaShip-Backend
-npm install
+   cd WanaShip-Backend
+   npm install
 
 3. **Set up environment variables**
-Create a `.env` file in the root directory and add the following:
+   Create a `.env` file in the root directory and add the following:
+
 - PORT: `3000`
 - BASE_URL: `http://localhost:3000`
 - API_PREFIX: `/wanaship/dev`
@@ -85,7 +87,7 @@ Create a `.env` file in the root directory and add the following:
 - DISCORD_CLIENT_SECRET: `YOUR_DISCORD_CLIENT_SECRET`
 
 4. **Run the application**
-npm run dev
+   npm run dev
 
 ## 📚 API Documentation
 
@@ -108,8 +110,8 @@ This project is [MIT](LICENSE) licensed.
 
 **Badr Karrachai**
 
-- GitHub: [@badrkarrachai](https://github.com/badrkarrachai)
-- LinkedIn: [Badr Karrachai](https://www.linkedin.com/in/badrkarrachai/)
+- [GitHub](https://github.com/badrkarrachai)
+- [LinkedIn](https://www.linkedin.com/in/badr-karrachai/)
 
 ---
 
