@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 import e from "express";
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
-
 const envFound = dotenv.config();
 
 if (envFound.error) {
@@ -19,6 +17,7 @@ export default {
     version: process.env.APP_VERSION,
     audience: process.env.AUDIENCE,
     recoveryPeriod: parseInt(process.env.ACCOUNT_RECOVERY_PERIOD, 10),
+    env: process.env.NODE_ENV,
   },
   logs: {
     morgan: process.env.MORGAN,
@@ -26,7 +25,12 @@ export default {
   mongodb: {
     url: process.env.MONGODB_URL,
   },
-  jwtSecret: process.env.JWT_SECRET,
+  jwtSecret: {
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
+    accessTokenExpiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRES_IN, 10),
+    refreshTokenExpiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN, 10),
+  },
   email: {
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT, 10),

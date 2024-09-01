@@ -1,6 +1,5 @@
 import { Router } from "express";
 
-import auth from "../middlewares/auth_middleware";
 import { createParcel } from "../../controllers/parcels_controllers/create_parcel_controller";
 import { deleteParcel } from "../../controllers/parcels_controllers/delete_parcel_controller";
 import { listParcels } from "../../controllers/parcels_controllers/list_parcels_controller";
@@ -10,6 +9,7 @@ import { PERMISSIONS } from "../../config/permissions";
 import { checkEmailVerified } from "../middlewares/check_email_verified_middleware";
 import { checkAccountNotDeleted } from "../middlewares/check_account_deleted_middleware";
 import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
+import { authenticateToken } from "../middlewares/auth_middleware";
 
 const router = Router();
 
@@ -22,28 +22,28 @@ const checkingEDA = [
 
 router.post(
   "/create-parcel",
-  auth,
+  authenticateToken,
   checkingEDA,
   checkPermission(PERMISSIONS.CREATE_PARCEL),
   createParcel
 );
 router.delete(
   "/delete-parcel",
-  auth,
+  authenticateToken,
   checkingEDA,
   checkPermission(PERMISSIONS.DELETE_PARCEL),
   deleteParcel
 );
 router.get(
   "/list-parcel",
-  auth,
+  authenticateToken,
   checkingEDA,
   checkPermission(PERMISSIONS.LIST_PARCEL),
   listParcels
 );
 router.post(
   "/assign-parcel",
-  auth,
+  authenticateToken,
   checkingEDA,
   checkPermission(PERMISSIONS.ASSIGN_PARCEL),
   assignParcel

@@ -3,7 +3,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../../models/users_model";
 import Image from "../../models/image_model";
-import { generateToken } from "../../utils/jwt_util";
+
 import {
   sendSuccessResponse,
   sendErrorResponse,
@@ -13,6 +13,7 @@ import bcrypt from "bcrypt";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
 import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 import { sendWelcomeEmail } from "../../utils/email_sender_util";
+import { prepareJWTTokensForAuth } from "../../utils/jwt_util";
 
 // Configure Passport Google Strategy
 passport.use(
@@ -165,8 +166,8 @@ export const googleAuthCallback = (req: Request, res: Response) => {
         messagesForUser.push(recoveryMessage);
       }
 
-      // Generate JWT token
-      const token = generateToken(user.id, user.role);
+      // Generate JWT tokens
+      const accessToken = prepareJWTTokensForAuth(user, res);
 
       const userData = await formatUserData(user, messagesForUser);
 
@@ -178,7 +179,7 @@ export const googleAuthCallback = (req: Request, res: Response) => {
         res,
         message: "Google authentication successful",
         data: {
-          token,
+          accessToken,
           user: userData,
         },
         status: 200,

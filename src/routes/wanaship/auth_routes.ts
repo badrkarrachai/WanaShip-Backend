@@ -17,8 +17,10 @@ import {
   discordAuthCallback,
 } from "../../controllers/auth_controllers/discord_auth_controller";
 import { me } from "../../controllers/auth_controllers/me_controller";
-import auth from "../middlewares/auth_middleware";
 import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
+import { authenticateToken } from "../middlewares/auth_middleware";
+import { refreshToken } from "../../controllers/auth_controllers/refresh_token_controller";
+import { logout } from "../../controllers/auth_controllers/logout_controller";
 
 const router = Router();
 
@@ -35,6 +37,8 @@ router.get("/google", rateLimiterGeneral, googleAuth);
 router.get("/google/callback", rateLimiterGeneral, googleAuthCallback);
 router.get("/discord", rateLimiterGeneral, discordAuth);
 router.get("/discord/callback", rateLimiterGeneral, discordAuthCallback);
-router.get("/me", auth, checkAccountActivated, me);
+router.get("/me", authenticateToken, checkAccountActivated, me);
+router.post("/refresh-token", refreshToken);
+router.post("/logout", authenticateToken, logout);
 
 export default router;

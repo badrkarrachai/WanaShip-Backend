@@ -2,23 +2,24 @@ import { Request, Response } from "express";
 import User from "../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { sendEmail, sendWelcomeEmail } from "../../utils/email_sender_util";
-import { readHtmlTemplate } from "../../utils/read_html_util";
-import { generateToken } from "../../utils/jwt_util";
+import { sendWelcomeEmail } from "../../utils/email_sender_util";
 import config from "../../config";
 import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../utils/response_handler_util";
-import { body, validationResult } from "express-validator";
 import {
   registrationValidationRules,
   validateRequest,
 } from "../../utils/validations_util";
-import { IUser } from "../../interfaces/user_interface";
 import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  prepareJWTTokensForAuth,
+} from "../../utils/jwt_util";
+import { IUser } from "../../interfaces/user_interface";
 
-// Registration with email verification false
 export const register = async (req: Request, res: Response) => {
   try {
     let messagesForUser: string[] = [];
@@ -38,6 +39,7 @@ export const register = async (req: Request, res: Response) => {
         status: 400,
       });
     }
+
     // Get the data from the request body
     const { name, email, password } = req.body;
 
@@ -68,25 +70,28 @@ export const register = async (req: Request, res: Response) => {
     });
     await newUser.save();
 
-    // check is user email verified
+    // Check if user email is verified
     if (!newUser.emailVerified) {
-      messagesForUser.push(`Please verify your email to use full features.`);
+      messagesForUser.push("Please verify your email to use full features.");
     }
 
-    // Send welcome email to the user
+    // Send a welcome email to the user
     sendWelcomeEmail(newUser);
 
-    // Prepare user data for response
+    // Prepare user data for the response
     const userData = await formatUserData(newUser, messagesForUser);
 
-    // Generate JWT token
-    const token = generateToken(newUser.id, newUser.role);
+    // Generate JWT tokens
+    const accessToken = prepareJWTTokensForAuth(newUser, res);
 
     // Send response
     return sendSuccessResponse({
       res,
-      message: "registration successful",
-      data: { token, user: userData },
+      message: "Registration successful",
+      data: {
+        accessToken,
+        user: userData,
+      },
       status: 201,
     });
   } catch (err) {

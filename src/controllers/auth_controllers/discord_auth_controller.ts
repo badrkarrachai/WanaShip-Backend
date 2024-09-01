@@ -3,7 +3,7 @@ import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import User from "../../models/users_model";
 import Image, { IImages } from "../../models/image_model";
-import { generateToken } from "../../utils/jwt_util";
+import { prepareJWTTokensForAuth } from "../../utils/jwt_util";
 import {
   sendSuccessResponse,
   sendErrorResponse,
@@ -158,7 +158,8 @@ export const discordAuthCallback = (req: Request, res: Response) => {
         messagesForUser.push(recoveryMessage);
       }
 
-      const token = generateToken(user.id, user.role);
+      // Generate JWT tokens
+      const accessToken = prepareJWTTokensForAuth(user, res);
 
       const userData = await formatUserData(user, messagesForUser);
 
@@ -170,7 +171,7 @@ export const discordAuthCallback = (req: Request, res: Response) => {
         res,
         message: "Discord authentication successful",
         data: {
-          token,
+          accessToken,
           user: userData,
         },
         status: 200,

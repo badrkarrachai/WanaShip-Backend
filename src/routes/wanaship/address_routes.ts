@@ -1,9 +1,10 @@
 import { Router } from "express";
-import auth from "../middlewares/auth_middleware";
+
 import { createAddress } from "../../controllers/addresses_controllers/create_address_controller";
+import { authenticateToken } from "../middlewares/auth_middleware";
 
 const router = Router();
 
-router.post("/create-address", auth, createAddress);
+router.post("/create-address", authenticateToken, createAddress);
 
 export default router;

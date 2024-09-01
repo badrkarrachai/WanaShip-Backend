@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import User from "../../models/users_model";
-import { generateToken } from "../../utils/jwt_util";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  prepareJWTTokensForAuth,
+} from "../../utils/jwt_util";
 import sanitize from "mongo-sanitize";
 import bcrypt from "bcrypt";
 import {
@@ -108,8 +112,8 @@ export const login = async (req: Request, res: Response) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate JWT token
-    const token = generateToken(user.id, user.role);
+    // Generate JWT tokens
+    const accessToken = prepareJWTTokensForAuth(user, res);
 
     // Prepare user data for response
     const userData = await formatUserData(user, messagesForUser);
@@ -119,7 +123,7 @@ export const login = async (req: Request, res: Response) => {
       res: res,
       message: "Login successful",
       data: {
-        token,
+        accessToken,
         user: userData,
       },
     });

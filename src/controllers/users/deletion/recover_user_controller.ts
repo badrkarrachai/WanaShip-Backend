@@ -1,17 +1,12 @@
 import { Request, Response } from "express";
 import User from "../../../models/users_model";
-import { JwtPayload } from "../../../interfaces/jwt_payload_interface";
 import {
   sendSuccessResponse,
   sendErrorResponse,
 } from "../../../utils/response_handler_util";
 
-interface AuthRequest extends Request {
-  user?: JwtPayload["user"];
-}
-
 // Recover deleted user
-export const recoverUser = async (req: AuthRequest, res: Response) => {
+export const recoverUser = async (req: Request, res: Response) => {
   if (!req.user) {
     return sendErrorResponse({
       res: res,

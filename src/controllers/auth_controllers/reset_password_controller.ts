@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../models/users_model";
-import { generateToken } from "../../utils/jwt_util";
+import { prepareJWTTokensForAuth } from "../../utils/jwt_util";
 import config from "../../config";
 import bcrypt from "bcrypt";
 import {
@@ -174,8 +174,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate JWT
-    const token = generateToken(user.id, user.role);
+    // Generate JWT tokens
+    const accessToken = prepareJWTTokensForAuth(user, res);
 
     // Prepare user data for response
     const userData = await formatUserData(user, messagesForUser);
@@ -184,7 +184,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       res: res,
       message: "Password reset successful",
       data: {
-        token,
+        accessToken,
         user: userData,
       },
       status: 200,

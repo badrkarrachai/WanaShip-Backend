@@ -1,39 +1,31 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import config from "../../config";
+import { verifyAccessToken } from "../../utils/jwt_util"; // Update this import path as needed
 import { JwtPayload } from "../../interfaces/jwt_payload_interface";
 import { sendErrorResponse } from "../../utils/response_handler_util";
 import User from "../../models/users_model";
 
-interface AuthRequest extends Request {
-  user?: JwtPayload["user"];
-}
-
-export default async function (
-  req: AuthRequest,
+export const authenticateToken = async (
+  req: Request,
   res: Response,
   next: NextFunction
-) {
-  // Get token from header
-  const token = req.header("Authorization")?.split(" ")[1]; // Bearer token format
+) => {
+  const authHeader = req.header("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
 
-  // Check if not token
   if (!token) {
     return sendErrorResponse({
       res: res,
       message: "Unauthorized",
       errorCode: "UNAUTHORIZED",
-      errorDetails: "User authentication is required for this action.",
+      errorDetails: "No authentication token provided.",
       status: 401,
     });
   }
 
-  // Verify token
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload;
+    const decoded = verifyAccessToken(token);
     req.user = decoded.user;
 
-    // Check if user still exists in the database
     const user = await User.findById(req.user.id);
     if (!user) {
       return sendErrorResponse({
@@ -47,12 +39,20 @@ export default async function (
 
     next();
   } catch (err) {
-    if (err instanceof jwt.JsonWebTokenError) {
+    if (err.name === "TokenExpiredError") {
       return sendErrorResponse({
         res: res,
-        message: "Token is not valid",
-        errorCode: "UNAUTHORIZED",
-        errorDetails: "User authentication is required for this action.",
+        message: "Token expired",
+        errorCode: "TOKEN_EXPIRED",
+        errorDetails: "The provided authentication token has expired.",
+        status: 401,
+      });
+    } else if (err.name === "JsonWebTokenError") {
+      return sendErrorResponse({
+        res: res,
+        message: "Invalid token",
+        errorCode: "INVALID_TOKEN",
+        errorDetails: "The provided authentication token is invalid.",
         status: 401,
       });
     }
@@ -65,4 +65,4 @@ export default async function (
       status: 500,
     });
   }
-}
+};

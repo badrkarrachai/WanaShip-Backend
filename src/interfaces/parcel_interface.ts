@@ -1,5 +1,4 @@
 import { Document, Types } from "mongoose";
-import { IImages } from "./image_interface";
 import { IAddress } from "./address_interface";
 import { IUser } from "./user_interface";
 
