@@ -1,38 +1,94 @@
 import jwt from "jsonwebtoken";
 import config from "../config";
 import { JwtPayload } from "../interfaces/jwt_payload_interface";
+import { IUser } from "../interfaces/user_interface";
+import { Response } from "express";
+import crypto from "crypto";
 
-const secret = config.jwtSecret;
+const accessTokenSecret = config.jwtSecret.accessTokenSecret;
+const refreshTokenSecret = config.jwtSecret.refreshTokenSecret;
 
 // Function to generate a unique JWT ID
 const generateUniqueId = (): string => {
-  return Math.random().toString(36).substring(2, 9);
+  return crypto.randomBytes(16).toString("hex");
 };
 
-export const generateToken = (userId: string, userRole: string): string => {
+// Generate Access Token
+export const generateAccessToken = (
+  userId: string,
+  userRole: string
+): string => {
   const payload: JwtPayload = {
     user: {
       id: userId,
       role: userRole,
     },
-    iss: config.app.issuer, // Issuer
-    sub: userId, // Subject
-    aud: config.app.audience, // Audience (can be a string or array of strings)
-    iat: Math.floor(Date.now() / 1000), // Issued at (in seconds)
-    nbf: Math.floor(Date.now() / 1000), // Not before (in seconds)
-    jti: generateUniqueId(), // JWT ID (unique identifier)
+    iss: config.app.issuer,
+    sub: userId,
+    aud: config.app.audience,
+    iat: Math.floor(Date.now() / 1000),
+    nbf: Math.floor(Date.now() / 1000),
+    jti: generateUniqueId(),
   };
 
-  return jwt.sign(payload, secret, { expiresIn: "30d" }); // Short expiration time for increased security
+  return jwt.sign(payload, accessTokenSecret, {
+    expiresIn: `${config.jwtSecret.accessTokenExpiresIn}m`,
+    algorithm: "HS256",
+  });
 };
 
-export const verifyToken = (token: string): JwtPayload => {
-  try {
-    return jwt.verify(token, secret, {
-      audience: config.app.audience, // Verify audience
-      issuer: config.app.issuer, // Verify issuer
-    }) as JwtPayload;
-  } catch (err) {
-    throw new Error("Invalid token");
-  }
+// Generate Refresh Token
+export const generateRefreshToken = (
+  userId: string,
+  userRole: string
+): string => {
+  const payload: JwtPayload = {
+    user: {
+      id: userId,
+      role: userRole,
+    },
+    iss: config.app.issuer,
+    sub: userId,
+    aud: config.app.audience,
+    iat: Math.floor(Date.now() / 1000),
+    nbf: Math.floor(Date.now() / 1000),
+    jti: generateUniqueId(),
+  };
+
+  return jwt.sign(payload, refreshTokenSecret, {
+    expiresIn: `${config.jwtSecret.refreshTokenExpiresIn}d`,
+    algorithm: "HS256",
+  });
+};
+
+// Verify Access Token
+export const verifyAccessToken = (token: string): JwtPayload => {
+  return jwt.verify(token, accessTokenSecret, {
+    audience: config.app.audience,
+    issuer: config.app.issuer,
+    algorithms: ["HS256"],
+  }) as JwtPayload;
+};
+
+// Verify Refresh Token
+export const verifyRefreshToken = (token: string): JwtPayload => {
+  return jwt.verify(token, refreshTokenSecret, {
+    audience: config.app.audience,
+    issuer: config.app.issuer,
+    algorithms: ["HS256"],
+  }) as JwtPayload;
+};
+
+// Prepare JWT for auth responses
+export const prepareJWTTokensForAuth = (user: IUser, res: Response): string => {
+  const accessToken = generateAccessToken(user.id, user.role);
+  const refreshToken = generateRefreshToken(user.id, user.role);
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.app.env === "production",
+    sameSite: "strict",
+    maxAge: config.jwtSecret.refreshTokenExpiresIn * 24 * 60 * 60 * 1000,
+  });
+  return accessToken;
 };

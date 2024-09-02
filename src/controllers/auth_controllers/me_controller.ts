@@ -1,4 +1,3 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 import User from "../../models/users_model";
 import {
   sendErrorResponse,
@@ -9,11 +8,11 @@ import { formatUserData } from "../../utils/responces_templates/user_auth_respon
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
 import config from "../../config";
 
-export const me = async (req: AuthRequest, res: Response) => {
+export const me = async (req: Request, res: Response) => {
   const userId = req.user.id;
   try {
     // Look up user by id
-    const user = await User.findOne({ _id: userId }).populate("avatar");
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       return sendErrorResponse({
         res: res,
@@ -51,7 +50,7 @@ export const me = async (req: AuthRequest, res: Response) => {
     }
 
     // Prepare user data for response
-    const userData = formatUserData(user);
+    const userData = await formatUserData(user);
 
     // Send response
     return sendSuccessResponse({

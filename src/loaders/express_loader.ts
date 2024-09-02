@@ -10,6 +10,7 @@ import {
 } from "../routes/middlewares/errors_middleware";
 import type { Express } from "express";
 import path from "path";
+import cookieParser from "cookie-parser";
 
 export default async function ({ app }: { app: Express }) {
   // Status checkpoints
@@ -25,6 +26,7 @@ export default async function ({ app }: { app: Express }) {
       contentSecurityPolicy: false,
     })
   );
+  app.use(cookieParser());
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));

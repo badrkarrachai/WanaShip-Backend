@@ -1,4 +1,3 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 import {
   sendErrorResponse,
   sendSuccessResponse,
@@ -8,12 +7,12 @@ import {
   validateRequest,
 } from "../../utils/validations_util";
 import sanitize from "mongo-sanitize";
-import Parcel from "../../models/parcel_model";
+import Parcel, { STATUS } from "../../models/parcel_model";
 import mongoose from "mongoose";
-import { Response } from "express";
+import { Response, Request } from "express";
 import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 
-export const deleteParcel = async (req: AuthRequest, res: Response) => {
+export const deleteParcel = async (req: Request, res: Response) => {
   try {
     // Validation
     const validationErrors = await validateRequest(
@@ -95,7 +94,7 @@ export const deleteParcel = async (req: AuthRequest, res: Response) => {
     }
 
     // Check if the parcel is not in the reshipping process
-    if (parcelExists.reshipperId && parcelExists.status !== "recived") {
+    if (parcelExists.reshipperId && parcelExists.status !== STATUS.RECIVED) {
       return sendErrorResponse({
         res,
         message: "Parcel in reshipping process",

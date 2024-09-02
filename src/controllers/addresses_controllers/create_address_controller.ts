@@ -1,5 +1,4 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
-import { Response } from "express";
+import { Response, Request } from "express";
 import {
   addAddressValidationRules,
   validateRequest,
@@ -12,7 +11,7 @@ import sanitize from "mongo-sanitize";
 import Address from "../../models/address_model";
 import { formatAddressData } from "../../utils/responces_templates/address_response_template";
 
-export const createAddress = async (req: AuthRequest, res: Response) => {
+export const createAddress = async (req: Request, res: Response) => {
   try {
     // Validation
     const validationErrors = await validateRequest(

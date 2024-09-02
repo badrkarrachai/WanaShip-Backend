@@ -12,12 +12,8 @@ import {
   updateProfileEmailViaOTPValidationRules,
   validateRequest,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const requestUpdateUserEmail = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const requestUpdateUserEmail = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, currentEmail, currentPassword } = req.body;
   try {
@@ -121,10 +117,7 @@ export const requestUpdateUserEmail = async (
 };
 
 // Update user email via OTP
-export const updateUserEmailViaOTP = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const updateUserEmailViaOTP = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, currentEmail, otp } = req.body;
   try {

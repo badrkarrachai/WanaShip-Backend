@@ -1,5 +1,4 @@
 import { Document, Types } from "mongoose";
-import { IImages } from "./image_interface";
 import { IAddress } from "./address_interface";
 import { IUser } from "./user_interface";
 
@@ -8,7 +7,7 @@ export interface IParcel extends Document {
   name: string;
   description?: string;
   price: number;
-  images: IImages[];
+  images: Types.ObjectId[];
   toAddress: Types.ObjectId | IAddress;
   quantity: number;
   isActive: boolean;
@@ -16,8 +15,10 @@ export interface IParcel extends Document {
   deletedAt?: Date;
   purchaseDate?: Date;
   reshipperId?: Types.ObjectId | IUser;
+  reshipperNote?: string;
   reshipperRecivedDate?: Date;
-  reshipperSentDate?: Date;
+  reshipperSendDate?: Date;
+  deliverdDate?: Date;
   reshipperRecivedQuantity?: number;
   status: string;
   trackingNumber: string;
