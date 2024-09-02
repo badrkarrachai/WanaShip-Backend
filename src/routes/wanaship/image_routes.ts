@@ -8,14 +8,14 @@ import {
 } from "../middlewares/upload_middleware";
 import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
 import { checkEmailVerified } from "../middlewares/check_email_verified_middleware";
-import { authenticateToken } from "../middlewares/auth_middleware";
+import { auth } from "../middlewares/auth_middleware";
 
 const router = Router();
 
 // Route for uploading a single profile picture
 router.post(
   "/single",
-  authenticateToken,
+  auth,
   checkAccountActivated,
   checkEmailVerified,
   (req, res, next) => {
@@ -28,7 +28,7 @@ router.post(
 // Route for uploading multiple parcel images
 router.post(
   "/multiple",
-  authenticateToken,
+  auth,
   checkAccountActivated,
   checkEmailVerified,
   (req, res, next) => {

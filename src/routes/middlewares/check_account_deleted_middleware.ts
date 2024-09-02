@@ -2,10 +2,9 @@ import { NextFunction } from "express";
 import { Request, Response } from "express";
 import User from "../../models/users_model";
 import { sendErrorResponse } from "../../utils/response_handler_util";
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 
 export const checkAccountNotDeleted = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

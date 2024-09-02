@@ -11,9 +11,8 @@ import {
   updateProfilePasswordValidationRules,
   validateRequest,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+export const updateUserPassword = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, currentPassword, newPassword, confirmPassword } = req.body;
   try {

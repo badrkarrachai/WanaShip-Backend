@@ -9,10 +9,9 @@ import {
   requesteleteAccountValidationRules,
   validateRequest,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Delete user
-export const deleteUser = async (req: AuthRequest, res: Response) => {
+export const deleteUser = async (req: Request, res: Response) => {
   if (!req.user) {
     return sendErrorResponse({
       res: res,

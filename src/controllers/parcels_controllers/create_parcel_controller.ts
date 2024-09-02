@@ -1,9 +1,8 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../../utils/response_handler_util";
-import { Response } from "express";
+import { Response, Request } from "express";
 import {
   addParcelValidationRules,
   validateRequest,
@@ -15,7 +14,7 @@ import mongoose from "mongoose";
 import Address from "../../models/address_model";
 import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 
-export const createParcel = async (req: AuthRequest, res: Response) => {
+export const createParcel = async (req: Request, res: Response) => {
   try {
     // Validation
     const validationErrors = await validateRequest(

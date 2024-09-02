@@ -1,10 +1,9 @@
-import { Response, NextFunction } from "express";
-import { AuthRequest } from "../../interfaces/auth_request_interface";
+import { Response, Request, NextFunction } from "express";
 import { sendErrorResponse } from "../../utils/response_handler_util";
 import { hasPermission } from "../../utils/permission_util";
 
 export const checkPermission = (requiredPermission: string) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return sendErrorResponse({
         res,

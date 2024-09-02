@@ -1,5 +1,4 @@
-import { Response } from "express";
-import { AuthRequest } from "../../interfaces/auth_request_interface";
+import { Response, Request } from "express";
 import Parcel from "../../models/parcel_model";
 import {
   sendSuccessResponse,
@@ -69,7 +68,7 @@ export const validateListParcelsInput = [
 ];
 
 export const listParcels = async (
-  req: AuthRequest,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {

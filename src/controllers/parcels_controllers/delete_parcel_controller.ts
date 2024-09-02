@@ -1,4 +1,3 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 import {
   sendErrorResponse,
   sendSuccessResponse,
@@ -10,10 +9,10 @@ import {
 import sanitize from "mongo-sanitize";
 import Parcel, { STATUS } from "../../models/parcel_model";
 import mongoose from "mongoose";
-import { Response } from "express";
+import { Response, Request } from "express";
 import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 
-export const deleteParcel = async (req: AuthRequest, res: Response) => {
+export const deleteParcel = async (req: Request, res: Response) => {
   try {
     // Validation
     const validationErrors = await validateRequest(

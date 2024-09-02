@@ -9,7 +9,7 @@ import { PERMISSIONS } from "../../config/permissions";
 import { checkEmailVerified } from "../middlewares/check_email_verified_middleware";
 import { checkAccountNotDeleted } from "../middlewares/check_account_deleted_middleware";
 import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
-import { authenticateToken } from "../middlewares/auth_middleware";
+import { auth } from "../middlewares/auth_middleware";
 
 const router = Router();
 
@@ -22,28 +22,28 @@ const checkingEDA = [
 
 router.post(
   "/create-parcel",
-  authenticateToken,
+  auth,
   checkingEDA,
   checkPermission(PERMISSIONS.CREATE_PARCEL),
   createParcel
 );
 router.delete(
   "/delete-parcel",
-  authenticateToken,
+  auth,
   checkingEDA,
   checkPermission(PERMISSIONS.DELETE_PARCEL),
   deleteParcel
 );
 router.get(
   "/list-parcel",
-  authenticateToken,
+  auth,
   checkingEDA,
   checkPermission(PERMISSIONS.LIST_PARCEL),
   listParcels
 );
 router.post(
   "/assign-parcel",
-  authenticateToken,
+  auth,
   checkingEDA,
   checkPermission(PERMISSIONS.ASSIGN_PARCEL),
   assignParcel

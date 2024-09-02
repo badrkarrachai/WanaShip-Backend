@@ -1,5 +1,4 @@
-import { Response } from "express";
-import { AuthRequest } from "../../interfaces/auth_request_interface";
+import { Response, Request } from "express";
 import Parcel, { STATUS } from "../../models/parcel_model";
 import User from "../../models/users_model";
 import {
@@ -10,14 +9,7 @@ import { isValidObjectId, Types } from "mongoose";
 import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 import { ROLES } from "../../config/permissions";
 
-interface AssignParcelRequest extends AuthRequest {
-  body: {
-    parcelId: string;
-    reshipperId: string;
-  };
-}
-
-export const assignParcel = async (req: AssignParcelRequest, res: Response) => {
+export const assignParcel = async (req: Request, res: Response) => {
   try {
     const { parcelId, reshipperId } = req.body;
 

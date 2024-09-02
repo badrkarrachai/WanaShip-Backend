@@ -7,14 +7,10 @@ import {
   sendErrorResponse,
 } from "../../../utils/response_handler_util";
 import { Types } from "mongoose";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 import { formatImageData } from "../../../utils/responces_templates/image_response_template";
 
 // Controller to update user profile picture
-export const updateUserProfilePicture = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const updateUserProfilePicture = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { imageId } = req.body;
 
@@ -78,10 +74,7 @@ export const updateUserProfilePicture = async (
 };
 
 // Controller to remove user profile picture
-export const removeUserProfilePicture = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const removeUserProfilePicture = async (req: Request, res: Response) => {
   const userId = req.user.id;
 
   try {
