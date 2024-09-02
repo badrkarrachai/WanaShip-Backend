@@ -68,10 +68,11 @@ This structure promotes separation of concerns, making the codebase easier to na
 - MONGODB_URL: `mongodb://localhost:27017/wanaship_db`
 - MORGAN: `dev`
 - NODE_ENV: `development`
-- JWT_SECRET: `YOUR_JWT_SECRET`
-- JWT_EXPIRY: `30d`
-- JWT_ALGORITHM: `HS256`
-- OTP_EXPIRATION: `10`
+- ACCESS_TOKEN_SECRET: `YOUR_JWT_ACCESS_TOKEN_SECRET`
+- REFRESH_TOKEN_SECRET: `YOUR_JWT_REFRESH_TOKEN_SECRET`
+- ACCESS_TOKEN_EXPIRES_IN: `10 (10 minutes)`
+- REFRESH_TOKEN_EXPIRES_IN `30 (30 days)`
+- OTP_EXPIRATION: `10 (10 minutes)`
 - EMAIL_HOST: `smtp.gmail.com`
 - EMAIL_PORT: `587`
 - EMAIL_SECURE: `false`
@@ -80,7 +81,7 @@ This structure promotes separation of concerns, making the codebase easier to na
 - RATE_LIMIT_WINDOW_MS: `15`
 - RATE_LIMIT_MAX: `10`
 - BCRYPT_ROUNDS: `10`
-- ACCOUNT_RECOVERY_PERIOD: `15`
+- ACCOUNT_RECOVERY_PERIOD: `15 (15 days)`
 - GOOGLE_CLIENT_ID: `YOUR_GOOGLE_CLIENT_ID`
 - GOOGLE_CLIENT_SECRET: `YOUR_GOOGLE_CLIENT_SECRET`
 - DISCORD_CLIENT_ID: `YOUR_DISCORD_CLIENT_ID`
