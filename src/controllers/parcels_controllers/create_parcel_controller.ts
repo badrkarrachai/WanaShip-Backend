@@ -40,9 +40,9 @@ export const createParcel = async (req: Request, res: Response) => {
       parcelQuantity,
       parcelPrice,
       parcelPurchaseDate,
-      toAddress,
-      trackingNumber,
-      weight,
+      parcelToAddress,
+      parcelTrackingNumber,
+      parcelWeight,
     } = req.body;
 
     // Sanitize input
@@ -52,9 +52,9 @@ export const createParcel = async (req: Request, res: Response) => {
       parcelQuantity: sanitize(parcelQuantity),
       parcelPrice: sanitize(parcelPrice),
       parcelPurchaseDate: sanitize(parcelPurchaseDate),
-      toAddress: sanitize(toAddress),
-      trackingNumber: sanitize(trackingNumber),
-      weight: sanitize(weight),
+      parcelToAddress: sanitize(parcelToAddress),
+      parcelTrackingNumber: sanitize(parcelTrackingNumber),
+      parcelWeight: sanitize(parcelWeight),
     };
 
     // Additional input validation
@@ -101,7 +101,7 @@ export const createParcel = async (req: Request, res: Response) => {
     }
 
     // Check if the toAddress is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(sanitizedData.toAddress)) {
+    if (!mongoose.Types.ObjectId.isValid(sanitizedData.parcelToAddress)) {
       return sendErrorResponse({
         res,
         message: "Invalid address",
@@ -113,7 +113,7 @@ export const createParcel = async (req: Request, res: Response) => {
 
     // Check if the address exists in the Address collection under the user
     const addressExists = await Address.findOne({
-      _id: sanitizedData.toAddress,
+      _id: sanitizedData.parcelToAddress,
       userId: userId, // Ensure the address belongs to the user
       isDeleted: false, // Ensure the address is not deleted
     });
@@ -131,9 +131,9 @@ export const createParcel = async (req: Request, res: Response) => {
     // Check if the parcel is already created by the user
     const parcelExists = await Parcel.findOne({
       userId: userId,
-      toAddress: sanitizedData.toAddress,
+      toAddress: sanitizedData.parcelToAddress,
       isDeleted: false,
-      trackingNumber: sanitizedData.trackingNumber,
+      trackingNumber: sanitizedData.parcelTrackingNumber,
     });
     if (parcelExists) {
       return sendErrorResponse({
@@ -157,10 +157,10 @@ export const createParcel = async (req: Request, res: Response) => {
       quantity: sanitizedData.parcelQuantity,
       price: sanitizedData.parcelPrice,
       purchaseDate: new Date(sanitizedData.parcelPurchaseDate),
-      toAddress: sanitizedData.toAddress, // Ensure this is included
+      toAddress: sanitizedData.parcelToAddress, // Ensure this is included
       referenceId: referenceId,
-      weight: sanitizedData.weight,
-      trackingNumber: sanitizedData.trackingNumber,
+      weight: sanitizedData.parcelWeight,
+      trackingNumber: sanitizedData.parcelTrackingNumber,
       status: STATUS.PENDING,
       isActive: true,
       isDeleted: false,

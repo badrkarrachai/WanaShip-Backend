@@ -1,6 +1,7 @@
 import { body, ValidationChain, validationResult } from "express-validator";
 import { sendErrorResponse } from "./response_handler_util";
 import { Request, Response } from "express";
+import { STATUS } from "../models/parcel_model";
 
 // Common validation rules
 const validationRules = {
@@ -81,16 +82,14 @@ const validationRules = {
   parcelQuantity: body("parcelQuantity")
     .exists()
     .withMessage("Parcel quantity is required")
-    .isInt()
-    .withMessage("Parcel quantity must be a number"),
-  trackingNumber: body("trackingNumber")
+    .isInt({ min: 1 })
+    .withMessage("Parcel quantity must be a number and at least 1"),
+  parcelTrackingNumber: body("parcelTrackingNumber")
     .exists()
     .withMessage("Tracking number is required")
     .isString()
-    .withMessage("Tracking number must be a string")
-    .isLength({ min: 1, max: 50 })
-    .withMessage("Tracking number must be 1-50 characters long"),
-  weight: body("weight")
+    .withMessage("Tracking number must be a string"),
+  parcelWeight: body("parcelWeight")
     .exists()
     .withMessage("Weight is required")
     .isFloat({ min: 0 })
@@ -105,7 +104,7 @@ const validationRules = {
     .withMessage("Parcel purchase date is required")
     .isDate()
     .withMessage("Parcel purchase date must be a date"),
-  toAddress: body("toAddress")
+  parcelToAddress: body("parcelToAddress")
     .exists()
     .withMessage("To address is required")
     .isString()
@@ -178,6 +177,30 @@ const validationRules = {
     .withMessage("Reference ID must be a string")
     .isLength({ min: 1, max: 250 })
     .withMessage("Reference ID must be 1-250 characters long"),
+  parcelImages: body("parcelImages")
+    .isArray({ max: 10 })
+    .withMessage("Parcel images must be an array with a maximum of 10 items"),
+  parcelReshipperNote: body("parcelReshipperNote")
+    .isString()
+    .withMessage("Parcel reshipper note must be a string")
+    .isLength({ max: 500 })
+    .withMessage("Parcel reshipper note must not exceed 500 characters"),
+  parcelReshipperRecivedQuantity: body("parcelReshipperRecivedQuantity")
+    .exists()
+    .withMessage("Parcel reshipper recived quantity is required")
+    .isInt({ min: 1 })
+    .withMessage(
+      "Parcel reshipper recived quantity must be a number and at least 1"
+    ),
+  parcelStatus: body("parcelStatus")
+    .exists()
+    .withMessage("Parcel status is required")
+    .isIn(Object.values(STATUS)) // Validate that it's one of the predefined statuses
+    .withMessage(
+      `Parcel status must be one of the following: ${Object.values(STATUS).join(
+        ", "
+      )}`
+    ),
 };
 
 // Validation rule sets for specific routes
@@ -244,9 +267,9 @@ export const addParcelValidationRules = [
   validationRules.parcelName,
   validationRules.parcelDescription,
   validationRules.parcelQuantity,
-  validationRules.trackingNumber,
-  validationRules.weight,
-  validationRules.toAddress,
+  validationRules.parcelTrackingNumber,
+  validationRules.parcelWeight,
+  validationRules.parcelToAddress,
   validationRules.parcelPrice,
   validationRules.parcelPurchaseDate,
 ];
@@ -264,6 +287,23 @@ export const addAddressValidationRules = [
   validationRules.zip,
   validationRules.countryCode,
   validationRules.phoneNumber,
+];
+
+// Update parcel validation rules
+export const updateParcelValidationRules = [
+  validationRules.parcelId,
+  validationRules.parcelName,
+  validationRules.parcelDescription,
+  validationRules.parcelPrice,
+  validationRules.parcelToAddress,
+  validationRules.parcelQuantity,
+  validationRules.parcelPurchaseDate,
+  validationRules.parcelTrackingNumber,
+  validationRules.parcelWeight,
+  validationRules.parcelImages,
+  validationRules.parcelReshipperNote,
+  validationRules.parcelReshipperRecivedQuantity,
+  validationRules.parcelStatus,
 ];
 
 // Call method to validate

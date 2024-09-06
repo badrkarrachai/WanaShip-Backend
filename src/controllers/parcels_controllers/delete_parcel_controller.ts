@@ -51,7 +51,7 @@ export const deleteParcel = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if the reference ID is start with #
+    // Check if the reference ID is start with # and has 6 characters
     if (
       !sanitizedData.referenceId.startsWith("#") &&
       sanitizedData.referenceId.length !== 6
@@ -94,13 +94,17 @@ export const deleteParcel = async (req: Request, res: Response) => {
     }
 
     // Check if the parcel is not in the reshipping process
-    if (parcelExists.reshipperId && parcelExists.status !== STATUS.RECIVED) {
+    if (
+      parcelExists.reshipperId &&
+      parcelExists.status !== STATUS.RECIVED &&
+      parcelExists.status !== STATUS.PENDING
+    ) {
       return sendErrorResponse({
         res,
         message: "Parcel in reshipping process",
         errorCode: "ALREADY_RESHIPPING",
         errorDetails:
-          "The provided parcel is currently in the reshipping process. Please try again after the reshipping process is completed.",
+          "This parcel is currently being reshipped. Please try again once the process is complete.",
         status: 400,
       });
     }

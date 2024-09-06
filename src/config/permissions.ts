@@ -37,7 +37,7 @@ const excludePermissions = (permissions, excludedPermissions) => {
 
 export const ROLE_PERMISSIONS = {
   [ROLES.ADMIN]: allPermissions,
-  [ROLES.USER]: excludePermissions(allPermissions, [PERMISSIONS.UPDATE_PARCEL]),
+  [ROLES.USER]: excludePermissions(allPermissions, []),
   [ROLES.RESHIPPER]: excludePermissions(allPermissions, [
     PERMISSIONS.ASSIGN_PARCEL,
   ]),

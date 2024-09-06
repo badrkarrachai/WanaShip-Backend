@@ -124,3 +124,6 @@ data/
 # Uploaded images
 /src/uploads/*
 !.gitignore
+
+# My notes
+MY.txt

@@ -10,6 +10,7 @@ import { checkEmailVerified } from "../middlewares/check_email_verified_middlewa
 import { checkAccountNotDeleted } from "../middlewares/check_account_deleted_middleware";
 import { checkAccountActivated } from "../middlewares/check_account_activated_middleware";
 import { auth } from "../middlewares/auth_middleware";
+import { updateParcel } from "../../controllers/parcels_controllers/update_parcel_controller";
 
 const router = Router();
 
@@ -47,5 +48,12 @@ router.post(
   checkingEDA,
   checkPermission(PERMISSIONS.ASSIGN_PARCEL),
   assignParcel
+);
+router.post(
+  "/update-parcel",
+  auth,
+  checkingEDA,
+  checkPermission(PERMISSIONS.UPDATE_PARCEL),
+  updateParcel
 );
 export default router;
