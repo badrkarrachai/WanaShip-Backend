@@ -27,7 +27,14 @@ export default async function ({ app }: { app: Express }) {
     })
   );
   app.use(cookieParser());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: "*",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+    })
+  );
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(morgan(config.logs.morgan));
