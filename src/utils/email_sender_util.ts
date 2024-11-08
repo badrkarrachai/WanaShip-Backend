@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 import config from "../config"; // Assume you have a config file with email settings
+import { readHtmlTemplate } from "./read_html_util";
+import { IUser } from "../interfaces/user_interface";
 
 interface EmailOptions {
   to: string;
@@ -36,3 +38,16 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     throw new Error("Email could not be sent");
   }
 };
+
+// Send welcome email to the user
+export async function sendWelcomeEmail(user: IUser) {
+  let htmlTemplate = readHtmlTemplate("welcome_to.html");
+  htmlTemplate = htmlTemplate.replace("{{NAME}}", user.name);
+
+  sendEmail({
+    to: user.email,
+    subject: `Welcome to ${config.app.appName}!`,
+    html: htmlTemplate,
+    text: "",
+  });
+}

@@ -2,6 +2,16 @@ import { Schema, model, Types } from "mongoose";
 import { IParcel } from "../interfaces/parcel_interface";
 import Image from "./image_model";
 
+export const STATUS = {
+  PENDING: "pending",
+  PROCESSING: "processing",
+  RECIVED: "recived",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  CANCELLED: "cancelled",
+  SENT: "sent",
+};
+
 const parcelSchema = new Schema<IParcel>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
@@ -16,14 +26,18 @@ const parcelSchema = new Schema<IParcel>(
     deletedAt: { type: Date },
     purchaseDate: { type: Date },
     reshipperId: { type: Schema.Types.ObjectId, ref: "User" },
+    reshipperNote: { type: String },
     reshipperRecivedDate: { type: Date },
-    reshipperSentDate: { type: Date },
+    reshipperSendDate: { type: Date },
+    deliverdDate: { type: Date },
     reshipperRecivedQuantity: { type: Number, default: null },
     status: {
       type: String,
-      enum: ["pending", "recived", "approved", "rejected", "cancelled", "sent"],
+      enum: Object.values(STATUS),
       default: "pending",
     },
+    trackingNumber: { type: String, required: true },
+    weight: { type: Number, required: true },
     referenceId: { type: String, required: true },
   },
   { timestamps: true }

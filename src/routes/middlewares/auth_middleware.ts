@@ -1,68 +1,95 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import config from "../../config";
+import { verifyAccessToken, verifyRefreshToken } from "../../utils/jwt_util";
 import { JwtPayload } from "../../interfaces/jwt_payload_interface";
 import { sendErrorResponse } from "../../utils/response_handler_util";
 import User from "../../models/users_model";
+import config from "../../config";
 
-interface AuthRequest extends Request {
-  user?: JwtPayload["user"];
-}
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.header("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
 
-export default async function (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) {
-  // Get token from header
-  const token = req.header("Authorization")?.split(" ")[1]; // Bearer token format
-
-  // Check if not token
   if (!token) {
     return sendErrorResponse({
       res: res,
-      message: "Unauthorized",
-      errorCode: "UNAUTHORIZED",
-      errorDetails: "User authentication is required for this action.",
+      message: "Please log in to access this feature",
+      errorCode: "LOGIN_REQUIRED",
+      errorDetails:
+        "Your session may have expired. Please log in again to continue.",
       status: 401,
     });
   }
 
-  // Verify token
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload;
+    const decoded = verifyAccessToken(token);
     req.user = decoded.user;
 
-    // Check if user still exists in the database
     const user = await User.findById(req.user.id);
     if (!user) {
       return sendErrorResponse({
         res: res,
-        message: "User not found",
-        errorCode: "USER_NOT_FOUND",
-        errorDetails: "The authenticated user no longer exists.",
+        message: "Account not found",
+        errorCode: "ACCOUNT_NOT_FOUND",
+        errorDetails:
+          "We couldn't find your account. Please contact support if you believe this is an error.",
         status: 404,
+      });
+    }
+
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return sendErrorResponse({
+        res: res,
+        message: "Session expired",
+        errorCode: "SESSION_EXPIRED",
+        errorDetails:
+          "Your session has expired. Please log in again to continue.",
+        status: 401,
+      });
+    }
+
+    try {
+      verifyRefreshToken(refreshToken);
+    } catch (err) {
+      return sendErrorResponse({
+        res: res,
+        message: "Session invalid",
+        errorCode: "INVALID_SESSION",
+        errorDetails:
+          "Your session is no longer valid. Please log in again for security reasons.",
+        status: 401,
       });
     }
 
     next();
   } catch (err) {
-    if (err instanceof jwt.JsonWebTokenError) {
+    if (err.name === "TokenExpiredError") {
       return sendErrorResponse({
         res: res,
-        message: "Token is not valid",
-        errorCode: "UNAUTHORIZED",
-        errorDetails: "User authentication is required for this action.",
+        message: "Session timed out",
+        errorCode: "SESSION_TIMEOUT",
+        errorDetails:
+          "Your session has timed out for security reasons. Please log in again to continue.",
+        status: 401,
+      });
+    } else if (err.name === "JsonWebTokenError") {
+      return sendErrorResponse({
+        res: res,
+        message: "Authentication failed",
+        errorCode: "AUTH_FAILED",
+        errorDetails:
+          "We couldn't verify your identity. Please try logging in again.",
         status: 401,
       });
     }
     console.error("Auth middleware error:", err);
     return sendErrorResponse({
       res: res,
-      message: "Server error",
-      errorCode: "INTERNAL_SERVER_ERROR",
-      errorDetails: "An unexpected error occurred during authentication.",
+      message: "Oops! Something went wrong",
+      errorCode: "UNEXPECTED_ERROR",
+      errorDetails:
+        "We encountered an unexpected error. Please try again later or contact support if the problem persists.",
       status: 500,
     });
   }
-}
+};

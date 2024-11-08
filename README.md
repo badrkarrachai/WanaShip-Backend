@@ -33,6 +33,7 @@ WanaShip-Backend is the server-side component of the WanaShip application, a mod
 ## 🏗 Project Structure
 
 Our backend follows a modular and organized structure to ensure scalability and maintainability:
+
 - **config/**: Contains configuration files for the application, including environment variables, database connections, and third-party service setups.
 - **controllers/**: Houses the logic for handling HTTP requests. Controllers act as an intermediary between the routes and services, processing incoming requests and sending responses.
 - **interfaces/**: Defines TypeScript interfaces used throughout the application, ensuring type safety and code consistency.
@@ -48,14 +49,15 @@ This structure promotes separation of concerns, making the codebase easier to na
 ## 🚦 Getting Started
 
 1. **Clone the repository**
-git clone https://github.com/badrkarrachai/WanaShip-Backend.git
+   git clone https://github.com/badrkarrachai/WanaShip-Backend.git
 
 2. **Install dependencies**
-cd WanaShip-Backend
-npm install
+   cd WanaShip-Backend
+   npm install
 
 3. **Set up environment variables**
-Create a `.env` file in the root directory and add the following:
+   Create a `.env` file in the root directory and add the following:
+
 - PORT: `3000`
 - BASE_URL: `http://localhost:3000`
 - API_PREFIX: `/wanaship/dev`
@@ -66,10 +68,11 @@ Create a `.env` file in the root directory and add the following:
 - MONGODB_URL: `mongodb://localhost:27017/wanaship_db`
 - MORGAN: `dev`
 - NODE_ENV: `development`
-- JWT_SECRET: `YOUR_JWT_SECRET`
-- JWT_EXPIRY: `30d`
-- JWT_ALGORITHM: `HS256`
-- OTP_EXPIRATION: `10`
+- ACCESS_TOKEN_SECRET: `YOUR_JWT_ACCESS_TOKEN_SECRET`
+- REFRESH_TOKEN_SECRET: `YOUR_JWT_REFRESH_TOKEN_SECRET`
+- ACCESS_TOKEN_EXPIRES_IN: `10 (10 minutes)`
+- REFRESH_TOKEN_EXPIRES_IN `30 (30 days)`
+- OTP_EXPIRATION: `10 (10 minutes)`
 - EMAIL_HOST: `smtp.gmail.com`
 - EMAIL_PORT: `587`
 - EMAIL_SECURE: `false`
@@ -78,14 +81,14 @@ Create a `.env` file in the root directory and add the following:
 - RATE_LIMIT_WINDOW_MS: `15`
 - RATE_LIMIT_MAX: `10`
 - BCRYPT_ROUNDS: `10`
-- ACCOUNT_RECOVERY_PERIOD: `15`
+- ACCOUNT_RECOVERY_PERIOD: `15 (15 days)`
 - GOOGLE_CLIENT_ID: `YOUR_GOOGLE_CLIENT_ID`
 - GOOGLE_CLIENT_SECRET: `YOUR_GOOGLE_CLIENT_SECRET`
 - DISCORD_CLIENT_ID: `YOUR_DISCORD_CLIENT_ID`
 - DISCORD_CLIENT_SECRET: `YOUR_DISCORD_CLIENT_SECRET`
 
 4. **Run the application**
-npm run dev
+   npm run dev
 
 ## 📚 API Documentation
 
@@ -108,8 +111,8 @@ This project is [MIT](LICENSE) licensed.
 
 **Badr Karrachai**
 
-- GitHub: [@badrkarrachai](https://github.com/badrkarrachai)
-- LinkedIn: [Badr Karrachai](https://www.linkedin.com/in/badrkarrachai/)
+- [GitHub](https://github.com/badrkarrachai)
+- [LinkedIn](https://www.linkedin.com/in/badr-karrachai/)
 
 ---
 

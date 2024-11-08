@@ -4,15 +4,13 @@ import cors from "cors";
 import morgan from "morgan";
 import config from "../config";
 import indexRouter from "../routes";
-import authRouter from "../routes/wanaship/auth_routes";
-import userRouter from "../routes/wanaship/users_routes";
 import {
   notFoundHandler,
   globalErrorHandler,
 } from "../routes/middlewares/errors_middleware";
 import type { Express } from "express";
 import path from "path";
-import imageRouter from "../routes/wanaship/image_routes";
+import cookieParser from "cookie-parser";
 
 export default async function ({ app }: { app: Express }) {
   // Status checkpoints
@@ -28,7 +26,15 @@ export default async function ({ app }: { app: Express }) {
       contentSecurityPolicy: false,
     })
   );
-  app.use(cors());
+  app.use(cookieParser());
+  app.use(
+    cors({
+      origin: "*",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+    })
+  );
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(morgan(config.logs.morgan));

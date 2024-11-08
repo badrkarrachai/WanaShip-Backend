@@ -1,20 +1,20 @@
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../../utils/response_handler_util";
-import { Response } from "express";
+import { Response, Request } from "express";
 import {
   addParcelValidationRules,
   validateRequest,
 } from "../../utils/validations_util";
 import sanitize from "mongo-sanitize";
-import Parcel from "../../models/parcel_model";
+import Parcel, { STATUS } from "../../models/parcel_model";
 import { generateReferenceId } from "../../utils/reference_id_generator_util";
 import mongoose from "mongoose";
 import Address from "../../models/address_model";
+import { formatParcelData } from "../../utils/responces_templates/parcel_response_template";
 
-export const createParcel = async (req: AuthRequest, res: Response) => {
+export const createParcel = async (req: Request, res: Response) => {
   try {
     // Validation
     const validationErrors = await validateRequest(
@@ -40,7 +40,9 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       parcelQuantity,
       parcelPrice,
       parcelPurchaseDate,
-      toAddress,
+      parcelToAddress,
+      parcelTrackingNumber,
+      parcelWeight,
     } = req.body;
 
     // Sanitize input
@@ -50,7 +52,9 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       parcelQuantity: sanitize(parcelQuantity),
       parcelPrice: sanitize(parcelPrice),
       parcelPurchaseDate: sanitize(parcelPurchaseDate),
-      toAddress: sanitize(toAddress),
+      parcelToAddress: sanitize(parcelToAddress),
+      parcelTrackingNumber: sanitize(parcelTrackingNumber),
+      parcelWeight: sanitize(parcelWeight),
     };
 
     // Additional input validation
@@ -97,7 +101,7 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
     }
 
     // Check if the toAddress is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(sanitizedData.toAddress)) {
+    if (!mongoose.Types.ObjectId.isValid(sanitizedData.parcelToAddress)) {
       return sendErrorResponse({
         res,
         message: "Invalid address",
@@ -109,7 +113,7 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
 
     // Check if the address exists in the Address collection under the user
     const addressExists = await Address.findOne({
-      _id: sanitizedData.toAddress,
+      _id: sanitizedData.parcelToAddress,
       userId: userId, // Ensure the address belongs to the user
       isDeleted: false, // Ensure the address is not deleted
     });
@@ -119,8 +123,26 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
         message: "Address not found",
         errorCode: "NOT_FOUND",
         errorDetails:
-          "The provided address does not exist. Please add a new address to your account first.",
+          "The provided address does not exist in your addresses list, Please add a new address to your account first.",
         status: 404,
+      });
+    }
+
+    // Check if the parcel is already created by the user
+    const parcelExists = await Parcel.findOne({
+      userId: userId,
+      toAddress: sanitizedData.parcelToAddress,
+      isDeleted: false,
+      trackingNumber: sanitizedData.parcelTrackingNumber,
+    });
+    if (parcelExists) {
+      return sendErrorResponse({
+        res,
+        message: "Parcel already created",
+        errorCode: "ALREADY_EXISTS",
+        errorDetails:
+          "A parcel with the same address and tracking number already exists, try updating the quantity of the existing parcel instead.",
+        status: 400,
       });
     }
 
@@ -135,28 +157,24 @@ export const createParcel = async (req: AuthRequest, res: Response) => {
       quantity: sanitizedData.parcelQuantity,
       price: sanitizedData.parcelPrice,
       purchaseDate: new Date(sanitizedData.parcelPurchaseDate),
-      toAddress: sanitizedData.toAddress, // Ensure this is included
+      toAddress: sanitizedData.parcelToAddress, // Ensure this is included
       referenceId: referenceId,
-      status: "pending",
+      weight: sanitizedData.parcelWeight,
+      trackingNumber: sanitizedData.parcelTrackingNumber,
+      status: STATUS.PENDING,
       isActive: true,
       isDeleted: false,
     });
 
     await parcel.save();
 
+    const parcelData = await formatParcelData(parcel);
+
     // Send response
     return sendSuccessResponse({
       res,
       message: "Parcel created successfully",
-      data: {
-        id: parcel._id,
-        name: parcel.name,
-        description: parcel.description,
-        price: parcel.price,
-        purchaseDate: parcel.purchaseDate,
-        referenceId: parcel.referenceId,
-        status: parcel.status,
-      },
+      data: parcelData,
       status: 201,
     });
   } catch (err) {

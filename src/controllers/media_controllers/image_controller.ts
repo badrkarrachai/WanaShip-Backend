@@ -9,12 +9,11 @@ import config from "../../config";
 import sharp from "sharp";
 import fs from "fs/promises";
 import { IImages } from "../../interfaces/image_interface";
-import { AuthRequest } from "../../interfaces/auth_request_interface";
 
 export const uploadImage = async (
   uploadType: "single" | "multiple",
   err: any,
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

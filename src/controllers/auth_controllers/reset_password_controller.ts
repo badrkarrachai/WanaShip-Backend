@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../models/users_model";
-import { generateToken } from "../../utils/jwt_util";
+import { prepareJWTTokensForAuth } from "../../utils/jwt_util";
 import config from "../../config";
 import bcrypt from "bcrypt";
 import {
@@ -15,7 +15,7 @@ import {
   validateRequest,
 } from "../../utils/validations_util";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
 
 // Request password reset
 export const requestPasswordReset = async (req: Request, res: Response) => {
@@ -95,7 +95,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     let messagesForUser: string[] = [];
 
     // Get the user with the email
-    const user = await User.findOne({ email }).populate("avatar");
+    const user = await User.findOne({ email });
     if (!user) {
       return sendErrorResponse({
         res: res,
@@ -174,17 +174,17 @@ export const resetPassword = async (req: Request, res: Response) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate JWT
-    const token = generateToken(user.id, user.role);
+    // Generate JWT tokens
+    const accessToken = prepareJWTTokensForAuth(user, res);
 
     // Prepare user data for response
-    const userData = formatUserData(user, messagesForUser);
+    const userData = await formatUserData(user, messagesForUser);
 
     return sendSuccessResponse({
       res: res,
       message: "Password reset successful",
       data: {
-        token,
+        accessToken,
         user: userData,
       },
       status: 200,

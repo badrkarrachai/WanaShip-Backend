@@ -9,9 +9,8 @@ import {
   updateProfileNameValidationRules,
   validateRequest,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserName = async (req: AuthRequest, res: Response) => {
+export const updateUserName = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, name } = req.body;
   try {

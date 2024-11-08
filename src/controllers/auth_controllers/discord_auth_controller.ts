@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import User from "../../models/users_model";
-import Image from "../../models/image_model";
-import { generateToken } from "../../utils/jwt_util";
+import Image, { IImages } from "../../models/image_model";
+import { prepareJWTTokensForAuth } from "../../utils/jwt_util";
 import {
   sendSuccessResponse,
   sendErrorResponse,
@@ -11,7 +11,9 @@ import {
 import config from "../../config";
 import bcrypt from "bcrypt";
 import { checkAccountRecoveryStatus } from "../../utils/account_deletion_check_util";
-import { formatUserData } from "../../utils/user_auth_response_util";
+import { formatUserData } from "../../utils/responces_templates/user_auth_response_template";
+import { Document } from "mongoose";
+import { sendWelcomeEmail } from "../../utils/email_sender_util";
 
 passport.use(
   new DiscordStrategy(
@@ -23,9 +25,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ discordId: profile.id }).populate(
-          "avatar"
-        );
+        let user = await User.findOne({ discordId: profile.id });
 
         if (user) {
           // Update existing user
@@ -36,10 +36,11 @@ passport.use(
 
           if (!user.avatar && profile.avatar) {
             const newAvatar = new Image({
+              userId: user.id, // Use id instead of id
               name: `${user.name}'s avatar`,
               url: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
             });
-            const savedAvatar = await newAvatar.save();
+            const savedAvatar = (await newAvatar.save()) as IImages & Document;
             user.avatar = savedAvatar.id;
           }
 
@@ -67,16 +68,22 @@ passport.use(
             tokenExpiresAt: new Date(Date.now() + 3600000), // 1 hour from now
           });
 
+          // Save the user first to get an id
+          await user.save();
+
           if (profile.avatar) {
             const newAvatar = new Image({
+              userId: user.id, // Now we have a valid id
               name: `${profile.username}'s avatar`,
               url: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
             });
-            const savedAvatar = await newAvatar.save();
+            const savedAvatar = (await newAvatar.save()) as IImages & Document;
             user.avatar = savedAvatar.id;
+            await user.save(); // Save again to update the avatar field
           }
 
-          await user.save();
+          // Send welcome email to the user
+          sendWelcomeEmail(user);
         }
 
         return done(null, user);
@@ -151,9 +158,10 @@ export const discordAuthCallback = (req: Request, res: Response) => {
         messagesForUser.push(recoveryMessage);
       }
 
-      const token = generateToken(user.id, user.role);
+      // Generate JWT tokens
+      const accessToken = prepareJWTTokensForAuth(user, res);
 
-      const userData = formatUserData(user, messagesForUser);
+      const userData = await formatUserData(user, messagesForUser);
 
       // Update last login
       user.lastLogin = new Date();
@@ -163,7 +171,7 @@ export const discordAuthCallback = (req: Request, res: Response) => {
         res,
         message: "Discord authentication successful",
         data: {
-          token,
+          accessToken,
           user: userData,
         },
         status: 200,

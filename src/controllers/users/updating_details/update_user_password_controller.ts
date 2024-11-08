@@ -3,14 +3,16 @@ import User from "../../../models/users_model";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import config from "../../../config";
-import { sendErrorResponse } from "../../../utils/response_handler_util";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../../utils/response_handler_util";
 import {
   updateProfilePasswordValidationRules,
   validateRequest,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
-export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+export const updateUserPassword = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, currentPassword, newPassword, confirmPassword } = req.body;
   try {
@@ -87,7 +89,11 @@ export const updateUserPassword = async (req: AuthRequest, res: Response) => {
     await user.save();
 
     // Send response
-    res.json({ msg: "User password updated successfully" });
+    return sendSuccessResponse({
+      res,
+      message: "User password updated successfully",
+      status: 200,
+    });
   } catch (err) {
     console.error("User password update error:", err);
     return sendErrorResponse({

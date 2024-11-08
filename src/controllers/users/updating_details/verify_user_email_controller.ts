@@ -11,13 +11,9 @@ import {
   validateRequest,
   verifyEmailValidationRules,
 } from "../../../utils/validations_util";
-import { AuthRequest } from "../../../interfaces/auth_request_interface";
 
 // Request user email verification
-export const requestVerifyUserEmail = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const requestVerifyUserEmail = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email } = req.body;
   try {
@@ -98,10 +94,7 @@ export const requestVerifyUserEmail = async (
 };
 
 // Verify user email via OTP
-export const verifyUserEmailViaOTP = async (
-  req: AuthRequest,
-  res: Response
-) => {
+export const verifyUserEmailViaOTP = async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { email, otp } = req.body;
   try {

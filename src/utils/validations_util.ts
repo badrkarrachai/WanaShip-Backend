@@ -1,6 +1,7 @@
 import { body, ValidationChain, validationResult } from "express-validator";
 import { sendErrorResponse } from "./response_handler_util";
 import { Request, Response } from "express";
+import { STATUS } from "../models/parcel_model";
 
 // Common validation rules
 const validationRules = {
@@ -69,6 +70,8 @@ const validationRules = {
   parcelName: body("parcelName")
     .exists()
     .withMessage("Parcel name is required")
+    .isString()
+    .withMessage("Parcel name must be a string")
     .isLength({ min: 3, max: 50 })
     .withMessage("Parcel name must be 3-50 characters long"),
   parcelDescription: body("parcelDescription")
@@ -79,8 +82,18 @@ const validationRules = {
   parcelQuantity: body("parcelQuantity")
     .exists()
     .withMessage("Parcel quantity is required")
-    .isInt()
-    .withMessage("Parcel quantity must be a number"),
+    .isInt({ min: 1 })
+    .withMessage("Parcel quantity must be a number and at least 1"),
+  parcelTrackingNumber: body("parcelTrackingNumber")
+    .exists()
+    .withMessage("Tracking number is required")
+    .isString()
+    .withMessage("Tracking number must be a string"),
+  parcelWeight: body("parcelWeight")
+    .exists()
+    .withMessage("Weight is required")
+    .isFloat({ min: 0 })
+    .withMessage("Weight must be a non-negative number"),
   parcelPrice: body("parcelPrice")
     .exists()
     .withMessage("Parcel price is required")
@@ -91,7 +104,7 @@ const validationRules = {
     .withMessage("Parcel purchase date is required")
     .isDate()
     .withMessage("Parcel purchase date must be a date"),
-  toAddress: body("toAddress")
+  parcelToAddress: body("parcelToAddress")
     .exists()
     .withMessage("To address is required")
     .isString()
@@ -150,6 +163,44 @@ const validationRules = {
     .withMessage("Phone number must be a string")
     .isLength({ min: 2, max: 50 })
     .withMessage("Phone number must be 2-50 characters long"),
+  parcelId: body("parcelId")
+    .exists()
+    .withMessage("Parcel ID is required")
+    .isString()
+    .withMessage("Parcel ID must be a string")
+    .isLength({ min: 1, max: 250 })
+    .withMessage("Parcel ID must be 1-250 characters long"),
+  referenceId: body("referenceId")
+    .exists()
+    .withMessage("Reference ID is required")
+    .isString()
+    .withMessage("Reference ID must be a string")
+    .isLength({ min: 1, max: 250 })
+    .withMessage("Reference ID must be 1-250 characters long"),
+  parcelImages: body("parcelImages")
+    .isArray({ max: 10 })
+    .withMessage("Parcel images must be an array with a maximum of 10 items"),
+  parcelReshipperNote: body("parcelReshipperNote")
+    .isString()
+    .withMessage("Parcel reshipper note must be a string")
+    .isLength({ max: 500 })
+    .withMessage("Parcel reshipper note must not exceed 500 characters"),
+  parcelReshipperRecivedQuantity: body("parcelReshipperRecivedQuantity")
+    .exists()
+    .withMessage("Parcel reshipper recived quantity is required")
+    .isInt({ min: 1 })
+    .withMessage(
+      "Parcel reshipper recived quantity must be a number and at least 1"
+    ),
+  parcelStatus: body("parcelStatus")
+    .exists()
+    .withMessage("Parcel status is required")
+    .isIn(Object.values(STATUS)) // Validate that it's one of the predefined statuses
+    .withMessage(
+      `Parcel status must be one of the following: ${Object.values(STATUS).join(
+        ", "
+      )}`
+    ),
 };
 
 // Validation rule sets for specific routes
@@ -216,9 +267,15 @@ export const addParcelValidationRules = [
   validationRules.parcelName,
   validationRules.parcelDescription,
   validationRules.parcelQuantity,
-  validationRules.toAddress,
+  validationRules.parcelTrackingNumber,
+  validationRules.parcelWeight,
+  validationRules.parcelToAddress,
   validationRules.parcelPrice,
   validationRules.parcelPurchaseDate,
+];
+export const deleteParcelValidationRules = [
+  validationRules.parcelId,
+  validationRules.referenceId,
 ];
 // Address validation rules
 export const addAddressValidationRules = [
@@ -230,6 +287,23 @@ export const addAddressValidationRules = [
   validationRules.zip,
   validationRules.countryCode,
   validationRules.phoneNumber,
+];
+
+// Update parcel validation rules
+export const updateParcelValidationRules = [
+  validationRules.parcelId,
+  validationRules.parcelName,
+  validationRules.parcelDescription,
+  validationRules.parcelPrice,
+  validationRules.parcelToAddress,
+  validationRules.parcelQuantity,
+  validationRules.parcelPurchaseDate,
+  validationRules.parcelTrackingNumber,
+  validationRules.parcelWeight,
+  validationRules.parcelImages,
+  validationRules.parcelReshipperNote,
+  validationRules.parcelReshipperRecivedQuantity,
+  validationRules.parcelStatus,
 ];
 
 // Call method to validate

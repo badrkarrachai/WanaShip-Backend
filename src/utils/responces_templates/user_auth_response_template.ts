@@ -1,4 +1,6 @@
-import { IUser } from "../interfaces/user_interface";
+import { IImages } from "../../interfaces/image_interface";
+import { IUser } from "../../interfaces/user_interface";
+import { formatImageData } from "./image_response_template";
 
 /**
  * Utility function to format user data for responses.
@@ -7,26 +9,18 @@ import { IUser } from "../interfaces/user_interface";
  * @param messagesForUser - Optional messages to include in the response.
  * @returns The formatted user data object.
  */
-export function formatUserData(
+export async function formatUserData(
   user: IUser,
   messagesForUser: string[] = []
-): Record<string, any> {
+): Promise<Record<string, any>> {
+  await user.populate("avatar");
+  const userAvatar = user.avatar ? formatImageData(user.avatar) : null;
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
-    avatar: user.avatar
-      ? {
-          id: user.avatar.id,
-          name: user.avatar.name,
-          url: user.avatar.url,
-          isDeleted: user.avatar.isDeleted,
-          deletedAt: user.avatar.deletedAt,
-          createdAt: user.avatar.createdAt,
-          updatedAt: user.avatar.updatedAt,
-        }
-      : null,
+    avatar: userAvatar,
     addresses: user.addresses,
     isActivated: user.isActivated,
     preferences: user.preferences,
